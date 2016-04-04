@@ -9,17 +9,31 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+
+import androidcourse.awesomerafflegame.Fragments.AboutFragment;
+import androidcourse.awesomerafflegame.Fragments.StartFragment;
+import androidcourse.awesomerafflegame.domain.FragmentController;
 
 public class MainActivity extends AppCompatActivity {
+    public static Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
+        setUpToolbar();
 
         createBluetooth();
+
+        createStartView();
+
+    }
+
+    private void createStartView(){
+        StartFragment startFragment = new StartFragment();
+        FragmentController.get().transactFragments(this, startFragment, "start_fragment");
     }
 
     private void createBluetooth(){
@@ -29,6 +43,12 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, BluetoothHandler.REQUEST_ENABLE_BT);
         }
     }
+
+    private void setUpToolbar(){
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -51,4 +71,5 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
