@@ -1,27 +1,29 @@
 package androidcourse.awesomerafflegame;
 
 import android.content.Intent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 
-import androidcourse.awesomerafflegame.Fragments.AboutFragment;
-import androidcourse.awesomerafflegame.Fragments.StartFragment;
+import androidcourse.awesomerafflegame.fragments.StartFragment;
 import androidcourse.awesomerafflegame.domain.FragmentController;
+import androidcourse.awesomerafflegame.sensors.ShakeSensor;
 
 public class MainActivity extends AppCompatActivity {
     public static Toolbar toolbar;
+
+    private ShakeSensor shakeSensor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        this.shakeSensor = new ShakeSensor(this);
 
         setUpToolbar();
 
@@ -72,4 +74,15 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        shakeSensor.register();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        shakeSensor.unregister();
+    }
 }

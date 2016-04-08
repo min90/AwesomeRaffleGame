@@ -1,4 +1,4 @@
-package androidcourse.awesomerafflegame.Fragments;
+package androidcourse.awesomerafflegame.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
