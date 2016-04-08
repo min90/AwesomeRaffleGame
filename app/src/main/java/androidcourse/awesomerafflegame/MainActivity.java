@@ -1,16 +1,14 @@
 package androidcourse.awesomerafflegame;
 
 import android.content.Intent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import androidcourse.awesomerafflegame.fragments.StartFragment;
 import androidcourse.awesomerafflegame.domain.FragmentController;
+import androidcourse.awesomerafflegame.fragments.StartFragment;
 import androidcourse.awesomerafflegame.sensors.ShakeSensor;
 
 public class MainActivity extends AppCompatActivity {

@@ -5,7 +5,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.view.Gravity;
 import android.widget.Toast;
 
 /**
@@ -35,7 +34,7 @@ public class ShakeSensor implements SensorEventListener {
         accelLast = accelCurrent;
         accelCurrent = (float) Math.sqrt((double) (x*x + y*y + z*z));
         float delta = accelCurrent - accelLast;
-        accel = accel * 0.9f + delta; // perform low-pass sensor
+        accel = accel * 0.9f + delta; // perform low-pass filter
 
         if(deviceShaken()) {
             Toast.makeText(context, "Shake it baybayy", Toast.LENGTH_LONG).show();
