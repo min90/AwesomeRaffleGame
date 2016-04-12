@@ -22,7 +22,7 @@ public class BluetoothHandler {
     public boolean setUpBluetooth(){
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(bluetoothAdapter == null){
-            Toast.makeText(context, "You're device does not support bluetooth", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Your device does not support bluetooth", Toast.LENGTH_SHORT).show();
             return false;
         } else {
             return true;

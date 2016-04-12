@@ -8,15 +8,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import androidcourse.awesomerafflegame.fragments.StartFragment;
+
 import androidcourse.awesomerafflegame.domain.FragmentController;
+import androidcourse.awesomerafflegame.fragments.StartFragment;
+import androidcourse.awesomerafflegame.sensors.ShakeSensor;
 
 public class MainActivity extends AppCompatActivity {
     public static Toolbar toolbar;
+
+    private ShakeSensor shakeSensor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        this.shakeSensor = new ShakeSensor(this);
 
         setUpToolbar();
 
@@ -67,4 +74,15 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        shakeSensor.register();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        shakeSensor.unregister();
+    }
 }
