@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import androidcourse.awesomerafflegame.fragments.StartFragment;
 
 import androidcourse.awesomerafflegame.domain.FragmentController;
-import androidcourse.awesomerafflegame.fragments.StartFragment;
 import androidcourse.awesomerafflegame.sensors.ShakeSensor;
 
 public class MainActivity extends AppCompatActivity {
