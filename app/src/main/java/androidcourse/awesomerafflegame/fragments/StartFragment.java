@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.domain.FragmentController;
@@ -15,10 +16,21 @@ import androidcourse.awesomerafflegame.domain.FragmentController;
  * Created by Jesper on 04/04/16.
  */
 public class StartFragment extends Fragment implements View.OnClickListener {
+    public static final String NAME_TAG = "name_tag";
 
     private Button btnStartGame;
     private Button btnResults;
     private Button btnAbout;
+
+    private TextView txtWelcomeMessage;
+
+    public static StartFragment newInstance(String name) {
+        StartFragment fragment = new StartFragment();
+        Bundle args = new Bundle();
+        args.putString(NAME_TAG, name);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
 
     @Nullable
@@ -26,12 +38,23 @@ public class StartFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_start, container, false);
 
+        Bundle args = getArguments();
+
+        String name = args.getString(NAME_TAG);
+
         btnStartGame = (Button) view.findViewById(R.id.btnStartGame);
         btnStartGame.setOnClickListener(this);
         btnResults = (Button) view.findViewById(R.id.btnResults);
         btnResults.setOnClickListener(this);
         btnAbout = (Button) view.findViewById(R.id.btnAbout);
         btnAbout.setOnClickListener(this);
+
+        txtWelcomeMessage = (TextView) view.findViewById(R.id.txtPlayername);
+        if(name != null) {
+            txtWelcomeMessage.setText("Player: " + name);
+        } else {
+            txtWelcomeMessage.setText("Player");
+        }
 
         return view;
     }
@@ -56,11 +79,11 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         }
 
         if(v.getId() == btnStartGame.getId()){
-
+            startGame();
         }
 
         if(v.getId() == btnResults.getId()){
-
+            results();
         }
     }
 }

@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">AwesomeRaffleGame</string>
     <string name="action_settings">Settings</string>
-    <string name="about_game">This game is made by Jesper and Mads, and it is about two players raffle against each other for a battle for the highest score</string>
+    <string name="about_game">This game is made by Jesper (Jesso12) and Mads(Majus12), and it is about two players raffle against each other for a battle for the highest score</string>
+    <string name="facebook_app_id">1713543598925716</string>
+    <string name="welcome_message">Welcome to the awesome raffle game</string>
 </resources>
