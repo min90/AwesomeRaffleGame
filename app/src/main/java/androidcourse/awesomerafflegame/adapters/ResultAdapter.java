@@ -18,37 +18,39 @@ import androidcourse.awesomerafflegame.models.Results;
 public class ResultAdapter extends RecyclerView.Adapter<ResultAdapter.ViewHolder> {
 
     private Context context;
-    private List<Results> results;
-    private LayoutInflater inflater;
+    private List<Results> resultsList;
 
     public ResultAdapter(Context context, List<Results> results) {
         this.context = context;
-        this.results = results;
-        inflater = LayoutInflater.from(context);
+        this.resultsList = results;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View viewHolder = inflater.inflate(R.layout.row_results, parent);
+        View viewHolder = LayoutInflater.from(context).inflate(R.layout.row_results, parent, false);
         return new ViewHolder(viewHolder);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-
+        Results result = resultsList.get(position);
+        holder.txtResult.setText(String.valueOf(result.getScore()));
+        holder.txtUser.setText(result.getUser());
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return resultsList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView textView;
+        TextView txtResult;
+        TextView txtUser;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            textView = (TextView) itemView.findViewById(R.id.txtViewResults);
+            txtResult = (TextView) itemView.findViewById(R.id.txtViewResults);
+            txtUser = (TextView) itemView.findViewById(R.id.txtUserResults);
         }
     }
 }

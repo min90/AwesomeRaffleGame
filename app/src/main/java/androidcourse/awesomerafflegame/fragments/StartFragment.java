@@ -1,14 +1,17 @@
 package androidcourse.awesomerafflegame.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidcourse.awesomerafflegame.BluetoothHandler;
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.domain.FragmentController;
 
@@ -16,11 +19,14 @@ import androidcourse.awesomerafflegame.domain.FragmentController;
  * Created by Jesper on 04/04/16.
  */
 public class StartFragment extends Fragment implements View.OnClickListener {
+    public static final String DEBUG_TAG = StartFragment.class.getSimpleName();
     public static final String NAME_TAG = "name_tag";
 
     private Button btnStartGame;
     private Button btnResults;
     private Button btnAbout;
+
+    private String name;
 
     private TextView txtWelcomeMessage;
 
@@ -40,7 +46,7 @@ public class StartFragment extends Fragment implements View.OnClickListener {
 
         Bundle args = getArguments();
 
-        String name = args.getString(NAME_TAG);
+        name = args.getString(NAME_TAG);
 
         btnStartGame = (Button) view.findViewById(R.id.btnStartGame);
         btnStartGame.setOnClickListener(this);
@@ -50,7 +56,7 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         btnAbout.setOnClickListener(this);
 
         txtWelcomeMessage = (TextView) view.findViewById(R.id.txtPlayername);
-        if(name != null) {
+        if (name != null) {
             txtWelcomeMessage.setText("Player: " + name);
         } else {
             txtWelcomeMessage.setText("Player");
@@ -59,30 +65,46 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
-    private void startGame(){
-
+    private void createBluetooth() {
+        BluetoothHandler bluetoothHandler = new BluetoothHandler(getActivity());
+        Intent intent = bluetoothHandler.enableBluetooth();
+        if (intent != null) {
+            startActivityForResult(intent, BluetoothHandler.REQUEST_ENABLE_BT);
+        }
     }
 
-    private void about(){
+    private void startGame() {
+        createBluetooth();
+    }
+
+    private void about() {
         AboutFragment aboutFragment = new AboutFragment();
         FragmentController.get().transactFragments(getActivity(), aboutFragment, "about_fragment");
     }
 
-    private void results(){
-
+    private void results() {
+        if (name != null) {
+            Log.d(DEBUG_TAG, "Hejsa");
+            Fragment resultFragment = ResultFragment.newInstance(name);
+            FragmentController.get().transactFragments(getActivity(), resultFragment, "result_Fragment");
+        } else {
+            Log.d(DEBUG_TAG, "Hejsa ikke");
+            Fragment resultFragment = ResultFragment.newInstance("Jesper");
+            FragmentController.get().transactFragments(getActivity(), resultFragment, "result_Fragment");
+        }
     }
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == btnAbout.getId()){
+        if (v.getId() == btnAbout.getId()) {
             about();
         }
 
-        if(v.getId() == btnStartGame.getId()){
+        if (v.getId() == btnStartGame.getId()) {
             startGame();
         }
 
-        if(v.getId() == btnResults.getId()){
+        if (v.getId() == btnResults.getId()) {
             results();
         }
     }

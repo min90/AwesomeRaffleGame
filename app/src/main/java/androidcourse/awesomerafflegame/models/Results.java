@@ -6,7 +6,7 @@ package androidcourse.awesomerafflegame.models;
 public class Results {
 
     private int score;
-    private Users user;
+    private String user;
 
     public int getScore() {
         return score;
@@ -16,11 +16,11 @@ public class Results {
         this.score = score;
     }
 
-    public Users getUser() {
+    public String getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(String user) {
         this.user = user;
     }
 

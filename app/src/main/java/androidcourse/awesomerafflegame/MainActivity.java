@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     private CallbackManager callbackManager;
     private AccessToken accessToken;
     private FrameLayout container;
-    private AccessTokenTracker accessTokenTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +56,6 @@ public class MainActivity extends AppCompatActivity {
         this.shakeSensor = new ShakeSensor(this);
 
         setUpToolbar();
-
-        createBluetooth();
-
-        //createStartView();
 
     }
 
@@ -101,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        accessTokenTracker = new AccessTokenTracker() {
+        AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
                 getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -132,14 +127,6 @@ public class MainActivity extends AppCompatActivity {
             startFragment = StartFragment.newInstance(null);
         }
         FragmentController.get().transactFragments(this, startFragment, "start_fragment");
-    }
-
-    private void createBluetooth() {
-        BluetoothHandler bluetoothHandler = new BluetoothHandler(this);
-        Intent intent = bluetoothHandler.enableBluetooth();
-        if (intent != null) {
-            startActivityForResult(intent, BluetoothHandler.REQUEST_ENABLE_BT);
-        }
     }
 
     private void setUpToolbar() {
