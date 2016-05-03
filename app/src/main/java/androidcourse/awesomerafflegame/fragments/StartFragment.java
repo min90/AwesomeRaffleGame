@@ -75,6 +75,7 @@ public class StartFragment extends Fragment implements View.OnClickListener {
 
     private void startGame() {
         createBluetooth();
+        FragmentController.get().transactFragments(getActivity(), new GameFragment(), "game_fragment");
     }
 
     private void about() {
