@@ -43,11 +43,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         callbackManager = CallbackManager.Factory.create();
         loginButton = (LoginButton) findViewById(R.id.login_button);
-        checkAccessToken();
-        createLogin();
+        //checkAccessToken();
+        //createLogin();
 
         setUpToolbar();
 
+        container = (FrameLayout) findViewById(R.id.fragment_container);
+        container.setVisibility(View.VISIBLE);
+        FragmentController.get().transactFragments(this, StartFragment.newInstance("Mogens"), "start_fragment");
     }
 
     @Override

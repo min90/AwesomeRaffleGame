@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Random;
@@ -24,10 +25,26 @@ import androidcourse.awesomerafflegame.sensors.ShakeSensor;
  */
 public class GameFragment extends Fragment implements View.OnClickListener, ShakeSensor.OnShakeListener {
 
+    private final int PLAYER_ONE = 1;
+    private final int PLAYER_TWO = 2;
+
     private ShakeSensor shakeSensor;
 
-    private ImageView imgDice, imgDice2;
-    private AnimationDrawable diceAnim, diceAnim2;
+    private AnimationDrawable dieOneAnimation, dieTwoAnimation;
+
+    private TextView tvCurrentPlayer;
+    private TextView tvPlayerOneScore;
+    private TextView tvPlayerTwoScore;
+    private TextView tvRoundScore;
+    private TextView tvAnnouncement;
+
+    private Button bHandOverDice;
+
+    private int currentPlayer;
+
+    private int playerOneTotalScore;
+    private int playerTwoTotalScore;
+    private int roundScore;
 
     @Nullable
     @Override
@@ -37,62 +54,164 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         this.shakeSensor = new ShakeSensor(getActivity());
         this.shakeSensor.setOnShakeListener(this);
 
-        imgDice = (ImageView) view.findViewById(R.id.img_dice);
-        imgDice.setBackgroundResource(R.drawable.anim_dice_1to6);
-        diceAnim = (AnimationDrawable) imgDice.getBackground();
-        diceAnim.selectDrawable(new Random().nextInt(6));
+        currentPlayer = PLAYER_ONE;
 
-        imgDice2 = (ImageView) view.findViewById(R.id.img_dice_2);
-        imgDice2.setBackgroundResource(R.drawable.anim_dice_3to2);
-        diceAnim2 = (AnimationDrawable) imgDice2.getBackground();
-        diceAnim2.selectDrawable(new Random().nextInt(6));
+        tvCurrentPlayer = (TextView) view.findViewById(R.id.tv_current_player);
+
+        tvPlayerOneScore = (TextView) view.findViewById(R.id.player_one_score);
+        tvPlayerTwoScore = (TextView) view.findViewById(R.id.player_two_score);
+
+        tvRoundScore = (TextView) view.findViewById(R.id.round_score);
+
+        tvAnnouncement = (TextView) view.findViewById(R.id.announcement);
+
+        playerOneTotalScore = 0;
+        roundScore = 0;
+
+        bHandOverDice = (Button) view.findViewById(R.id.btn_hand_over_dice);
+        bHandOverDice.setOnClickListener(this);
+
+        ImageView ivDieOne = (ImageView) view.findViewById(R.id.img_dice);
+        ivDieOne.setBackgroundResource(R.drawable.anim_dice_1to6);
+        dieOneAnimation = (AnimationDrawable) ivDieOne.getBackground();
+        dieOneAnimation.selectDrawable(new Random().nextInt(6));
+
+        ImageView ivDieTwo = (ImageView) view.findViewById(R.id.img_dice_2);
+        ivDieTwo.setBackgroundResource(R.drawable.anim_dice_3to2);
+        dieTwoAnimation = (AnimationDrawable) ivDieTwo.getBackground();
+        dieTwoAnimation.selectDrawable(new Random().nextInt(6));
 
         return view;
     }
 
-    @Override
-    public void onClick(View v) {
+    private void resetDice() {
+        tvAnnouncement.setText("");
+        dieOneAnimation.stop();
+        dieTwoAnimation.stop();
+        dieOneAnimation.selectDrawable(0);
+        dieTwoAnimation.selectDrawable(0);
     }
 
-    @Override
-    public void onShake(int count) {
-        diceAnim.stop();
-        diceAnim2.stop();
-        diceAnim.selectDrawable(0);
-        diceAnim2.selectDrawable(0);
-        Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-        v.vibrate(1000);
-        diceAnim.start();
-        diceAnim2.start();
+    private void rollDice(int duration) {
+        dieOneAnimation.start();
+        dieTwoAnimation.start();
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                int face = new Random().nextInt(6);
-                int face2 = new Random().nextInt(6);
-
-                diceAnim.stop();
-                diceAnim2.stop();
-                diceAnim.selectDrawable(face);
-                switch (face2 - 2) {
-                    case -2:
-                        diceAnim2.selectDrawable(4);
-                        break;
-                    case -1:
-                        diceAnim2.selectDrawable(5);
-                        break;
-                    default:
-                        diceAnim2.selectDrawable(face2 - 2);
-                        break;
-                }
-
-                Toast.makeText(
-                        getActivity(),
-                        "Du slog en " + (face + 1) + "'er og en " + (face2 + 1) + "'er",
-                        Toast.LENGTH_SHORT).show();
+                stopDice();
             }
-        }, 1000);
+        }, duration);
+    }
+
+    private void vibrateDevice(int ms) {
+        Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        v.vibrate(ms);
+    }
+
+    private void stopDice() {
+        int faceOne = new Random().nextInt(6);
+        int faceTwo = new Random().nextInt(6);
+
+        dieOneAnimation.stop();
+        dieOneAnimation.selectDrawable(faceOne);
+
+        dieTwoAnimation.stop();
+        switch (faceTwo - 2) {
+            case -2:
+                dieTwoAnimation.selectDrawable(4);
+                break;
+            case -1:
+                dieTwoAnimation.selectDrawable(5);
+                break;
+            default:
+                dieTwoAnimation.selectDrawable(faceTwo - 2);
+                break;
+        }
+
+        // Correct zero-indexed faces
+        int actualFaceOne = faceOne + 1;
+        int actualFaceTwo = faceTwo + 1;
+
+        if (currentPlayer == PLAYER_ONE) {
+            updatePlayerOneScore(actualFaceOne, actualFaceTwo);
+        } else {
+            updatePlayerTwoScore(actualFaceOne, actualFaceTwo);
+        }
+    }
+
+    private void updatePlayerOneScore(int faceOne, int faceTwo) {
+        if (faceOne == 1 && faceTwo == 1) {
+            playerOneTotalScore = 0;
+            handOverDice("Player 1 lost all points. Handing over dice");
+        } else if (faceOne == 1 ^ faceTwo == 1) {
+            if (!(roundScore < 0)) {
+                playerOneTotalScore -= roundScore;
+            }
+            handOverDice("Player 1 lost points for this round. Handing over dice");
+        } else {
+            roundScore += (faceOne + faceTwo);
+            playerOneTotalScore += (faceOne + faceTwo);
+            if (playerOneTotalScore >= 100) {
+                playerOneTotalScore = 100;
+                tvAnnouncement.setText("Player 1 won!");
+            }
+        }
+
+        tvRoundScore.setText(Integer.toString(roundScore));
+        tvPlayerOneScore.setText(Integer.toString(playerOneTotalScore));
+    }
+
+    private void updatePlayerTwoScore(int faceOne, int faceTwo) {
+        if (faceOne == 1 && faceTwo == 1) {
+            playerTwoTotalScore = 0;
+            handOverDice("Player 2 lost all points. Handing over dice");
+        } else if (faceOne == 1 ^ faceTwo == 1) {
+            if (!(roundScore < 0)) {
+                playerTwoTotalScore -= roundScore;
+            }
+            handOverDice("Player 2 lost points for this round. Handing over dice");
+        } else {
+            roundScore += (faceOne + faceTwo);
+            playerTwoTotalScore += (faceOne + faceTwo);
+            if (playerTwoTotalScore >= 100) {
+                playerTwoTotalScore = 100;
+                tvAnnouncement.setText("Player 2 won!");
+            }
+        }
+
+        tvRoundScore.setText(Integer.toString(roundScore));
+        tvPlayerTwoScore.setText(Integer.toString(playerTwoTotalScore));
+    }
+
+    private void handOverDice(String announcement) {
+        roundScore = 0;
+        tvRoundScore.setText("0");
+
+        tvAnnouncement.setText(announcement);
+
+        if (currentPlayer == PLAYER_ONE) {
+            currentPlayer = PLAYER_TWO;
+        } else {
+            currentPlayer = PLAYER_ONE;
+        }
+
+        tvCurrentPlayer.setText("Player " + currentPlayer + " has the dice");
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == bHandOverDice.getId()) {
+            handOverDice("Handing over dice");
+        }
+    }
+
+    @Override
+    public void onShake(int count) {
+        resetDice();
+        //vibrateDevice(1000);
+        rollDice(1000);
     }
 
     @Override
@@ -103,7 +222,6 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
 
     @Override
     public void onPause() {
-        // Add the following line to unregister the Sensor Manager onPause
         shakeSensor.unregister();
         super.onPause();
     }
