@@ -1,42 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="40dp">
+        android:orientation="vertical">
 
         <TextView
+            android:id="@+id/txtWelcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Large text"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="Welcome to the awesome raffle game"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/login_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="30dp"/>
+
+        <TextView
             android:id="@+id/txtPlayername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginTop="6dp"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_vertical|center_horizontal" />
+            android:gravity="center_vertical|center_horizontal"
+            android:text="Large text"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
 
         <Button
+            android:id="@+id/btnStartGame"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Start Game"
-            android:id="@+id/btnStartGame" />
+            android:text="Start Game"/>
 
         <Button
+            android:id="@+id/btnResults"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Results"
-            android:id="@+id/btnResults" />
+            android:text="Results"/>
 
         <Button
+            android:id="@+id/btnAbout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="About"
-            android:id="@+id/btnAbout" />
+            android:text="About"/>
     </LinearLayout>
 
 </LinearLayout>
