@@ -5,9 +5,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.FloatMath;
-import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Created by Mads on 08-04-16.
@@ -24,8 +21,11 @@ public class ShakeSensor implements SensorEventListener {
     private long mShakeTimestamp;
     private int mShakeCount;
 
+    private boolean isEnabled;
+
     public ShakeSensor(Context context) {
         this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        enable();
     }
 
     public void register() {
@@ -34,6 +34,18 @@ public class ShakeSensor implements SensorEventListener {
 
     public void unregister() {
         sensorManager.unregisterListener(this);
+    }
+
+    public void doShake() {
+        mListener.onShake(1);
+    }
+
+    public void disable() {
+        isEnabled = false;
+    }
+
+    public void enable() {
+        isEnabled = true;
     }
 
     public interface OnShakeListener {
@@ -57,7 +69,7 @@ public class ShakeSensor implements SensorEventListener {
         // gForce will be close to 1 when there is no movement.
         double gForce = Math.sqrt(gX * gX + gY * gY + gZ * gZ);
 
-        if (gForce > SHAKE_THRESHOLD_GRAVITY) {
+        if (gForce > SHAKE_THRESHOLD_GRAVITY && isEnabled) {
             final long now = System.currentTimeMillis();
             // ignore shake events too close to each other (500ms)
             if (mShakeTimestamp + SHAKE_SLOP_TIME_MS > now) {
