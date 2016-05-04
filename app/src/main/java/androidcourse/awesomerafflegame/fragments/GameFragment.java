@@ -36,7 +36,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     public static final int VS_PLAYER = 20;
     public static final int VS_COMPUTER = 21;
 
-    private final String TAG_VERSUS = "versus";
+    private static final String TAG_VERSUS = "versus";
 
     private ShakeSensor shakeSensor;
 
