@@ -13,8 +13,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import java.lang.reflect.Method;
 import java.util.Random;
 
 import androidcourse.awesomerafflegame.R;
@@ -26,7 +26,7 @@ import androidcourse.awesomerafflegame.sensors.ShakeSensor;
 public class GameFragment extends Fragment implements View.OnClickListener, ShakeSensor.OnShakeListener {
 
     private final int PLAYER_ONE = 1;
-    private final int PLAYER_TWO = 2;
+    private final int COMPUTER = 2;
 
     private ShakeSensor shakeSensor;
 
@@ -34,16 +34,17 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
 
     private TextView tvCurrentPlayer;
     private TextView tvPlayerOneScore;
-    private TextView tvPlayerTwoScore;
+    private TextView tvComputerScore;
     private TextView tvRoundScore;
     private TextView tvAnnouncement;
 
     private Button bHandOverDice;
 
     private int currentPlayer;
+    private String currentPlayerName;
 
     private int playerOneTotalScore;
-    private int playerTwoTotalScore;
+    private int computerTotalScore;
     private int roundScore;
 
     @Nullable
@@ -55,15 +56,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         this.shakeSensor.setOnShakeListener(this);
 
         currentPlayer = PLAYER_ONE;
+        currentPlayerName = "Player 1";
 
-        tvCurrentPlayer = (TextView) view.findViewById(R.id.tv_current_player);
-
-        tvPlayerOneScore = (TextView) view.findViewById(R.id.player_one_score);
-        tvPlayerTwoScore = (TextView) view.findViewById(R.id.player_two_score);
-
-        tvRoundScore = (TextView) view.findViewById(R.id.round_score);
-
-        tvAnnouncement = (TextView) view.findViewById(R.id.announcement);
+        initTextViews(view);
 
         playerOneTotalScore = 0;
         roundScore = 0;
@@ -71,6 +66,23 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         bHandOverDice = (Button) view.findViewById(R.id.btn_hand_over_dice);
         bHandOverDice.setOnClickListener(this);
 
+        initDiceIcons(view);
+
+        return view;
+    }
+
+    private void initTextViews(View view) {
+        tvCurrentPlayer = (TextView) view.findViewById(R.id.tv_current_player);
+
+        tvPlayerOneScore = (TextView) view.findViewById(R.id.player_one_score);
+        tvComputerScore = (TextView) view.findViewById(R.id.computer_score);
+
+        tvRoundScore = (TextView) view.findViewById(R.id.round_score);
+
+        tvAnnouncement = (TextView) view.findViewById(R.id.announcement);
+    }
+
+    private void initDiceIcons(View view) {
         ImageView ivDieOne = (ImageView) view.findViewById(R.id.img_dice);
         ivDieOne.setBackgroundResource(R.drawable.anim_dice_1to6);
         dieOneAnimation = (AnimationDrawable) ivDieOne.getBackground();
@@ -80,12 +92,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         ivDieTwo.setBackgroundResource(R.drawable.anim_dice_3to2);
         dieTwoAnimation = (AnimationDrawable) ivDieTwo.getBackground();
         dieTwoAnimation.selectDrawable(new Random().nextInt(6));
-
-        return view;
     }
 
     private void resetDice() {
-        tvAnnouncement.setText("");
         dieOneAnimation.stop();
         dieTwoAnimation.stop();
         dieOneAnimation.selectDrawable(0);
@@ -96,7 +105,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         dieOneAnimation.start();
         dieTwoAnimation.start();
 
-        final Handler handler = new Handler();
+        Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -111,6 +120,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     }
 
     private void stopDice() {
+        //Reset announcer
+        tvAnnouncement.setText("");
+
         int faceOne = new Random().nextInt(6);
         int faceTwo = new Random().nextInt(6);
 
@@ -137,7 +149,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         if (currentPlayer == PLAYER_ONE) {
             updatePlayerOneScore(actualFaceOne, actualFaceTwo);
         } else {
-            updatePlayerTwoScore(actualFaceOne, actualFaceTwo);
+            updateComputerScore(actualFaceOne, actualFaceTwo);
         }
     }
 
@@ -163,26 +175,28 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         tvPlayerOneScore.setText(Integer.toString(playerOneTotalScore));
     }
 
-    private void updatePlayerTwoScore(int faceOne, int faceTwo) {
+    private void updateComputerScore(int faceOne, int faceTwo) {
         if (faceOne == 1 && faceTwo == 1) {
-            playerTwoTotalScore = 0;
-            handOverDice("Player 2 lost all points. Handing over dice");
+            computerTotalScore = 0;
+            handOverDice("The computer lost all points. Handing over dice");
         } else if (faceOne == 1 ^ faceTwo == 1) {
             if (!(roundScore < 0)) {
-                playerTwoTotalScore -= roundScore;
+                computerTotalScore -= roundScore;
             }
-            handOverDice("Player 2 lost points for this round. Handing over dice");
+            handOverDice("The computer lost points for this round. Handing over dice");
         } else {
             roundScore += (faceOne + faceTwo);
-            playerTwoTotalScore += (faceOne + faceTwo);
-            if (playerTwoTotalScore >= 100) {
-                playerTwoTotalScore = 100;
-                tvAnnouncement.setText("Player 2 won!");
+            computerTotalScore += (faceOne + faceTwo);
+            if (computerTotalScore >= 100) {
+                computerTotalScore = 100;
+                tvAnnouncement.setText("Computer won!");
+            } else {
+                doComputerTurn();
             }
         }
 
         tvRoundScore.setText(Integer.toString(roundScore));
-        tvPlayerTwoScore.setText(Integer.toString(playerTwoTotalScore));
+        tvComputerScore.setText(Integer.toString(computerTotalScore));
     }
 
     private void handOverDice(String announcement) {
@@ -192,12 +206,35 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         tvAnnouncement.setText(announcement);
 
         if (currentPlayer == PLAYER_ONE) {
-            currentPlayer = PLAYER_TWO;
+            currentPlayer = COMPUTER;
+            currentPlayerName = "Computer";
         } else {
             currentPlayer = PLAYER_ONE;
+            currentPlayerName = "Player 1";
+            shakeSensor.enable();
         }
 
-        tvCurrentPlayer.setText("Player " + currentPlayer + " has the dice");
+        tvCurrentPlayer.setText(currentPlayerName + " has the dice");
+
+        if (currentPlayer == COMPUTER) {
+            doComputerTurn();
+        }
+    }
+
+    private void doComputerTurn() {
+        shakeSensor.disable();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (roundScore > 20) {
+                    handOverDice("Handing over dice");
+                } else {
+                    shakeSensor.doShake();
+                }
+            }
+        }, 1000);
     }
 
     @Override
@@ -210,7 +247,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     @Override
     public void onShake(int count) {
         resetDice();
-        //vibrateDevice(1000);
+        vibrateDevice(1000);
         rollDice(1000);
     }
 
