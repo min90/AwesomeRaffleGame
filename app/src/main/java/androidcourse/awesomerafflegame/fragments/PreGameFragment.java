@@ -53,7 +53,6 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
     private Button btnScan;
     private LinearLayout blueLayout;
 
-    private EditText tryText;
 
 
     @Nullable
@@ -72,13 +71,11 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
         btnScan = (Button) view.findViewById(R.id.btnScan);
         btnScan.setOnClickListener(this);
         blueLayout = (LinearLayout) view.findViewById(R.id.blueLayout);
-
-        tryText = (EditText) view.findViewById(R.id.editText);
-
+        
         return view;
     }
 
-    private void setUpProgressBar(){
+    private void setUpProgressBar() {
 
     }
 
@@ -103,6 +100,7 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
         }
         if (v.getId() == btnScan.getId()) {
             if (bluetoothAdapter != null) {
+                Log.d(DEBUG_TAG, "starting discovery");
                 bluetoothAdapter.startDiscovery();
             }
         }
@@ -120,6 +118,7 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
         }
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            Log.d(DEBUG_TAG, "Starting enable");
             startActivityForResult(enableIntent, REQUEST_ENABLE);
         }
 
@@ -127,6 +126,7 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(DEBUG_TAG, "Request: " + requestCode);
         switch (requestCode) {
             case REQUEST_ENABLE:
                 if (resultCode != Activity.RESULT_OK) {
@@ -153,6 +153,7 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
             Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
             discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
             startActivityForResult(discoverableIntent, REQUEST_DISCOVERABLE);
+            Log.d(DEBUG_TAG, "Activity: " + discoverableIntent.toString());
             return;
         }
         startListening();
@@ -242,7 +243,7 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
                 String result = new String(buffer);
                 //Close the connection
                 bluetoothSocket.close();
-                Log.d(DEBUG_TAG, "Result : " + result);
+                Log.d(DEBUG_TAG, "Result: " + result);
                 return result.trim();
             } catch (Exception exc) {
                 return null;
@@ -266,8 +267,7 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
                 BluetoothDevice device =
                         intent.getParcelableExtra(
                                 BluetoothDevice.EXTRA_DEVICE);
-                if (TextUtils.equals(device.getName(),
-                        SEARCH_NAME)) {
+                if (TextUtils.equals(device.getName(), SEARCH_NAME)) {
                     //Matching device found, connect
                     bluetoothAdapter.cancelDiscovery();
                     try {
@@ -277,13 +277,14 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
                         bluetoothSocket.connect();
                         ConnectedTask task = new ConnectedTask();
                         task.execute(bluetoothSocket);
+                        Toast.makeText(getActivity(), "Action found: " + bluetoothSocket.toString(), Toast.LENGTH_LONG).show();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
                 //When discovery is complete
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                Toast.makeText(getActivity(), "Fundet", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Discovery done", Toast.LENGTH_LONG).show();
             }
         }
     };
