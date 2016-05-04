@@ -89,7 +89,7 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
             if (blueLayout.getVisibility() == View.VISIBLE) {
                 blueLayout.setVisibility(View.GONE);
             }
-            FragmentController.get().transactFragments(getActivity(), new GameFragment(), "game_fragment");
+            FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_COMPUTER), "game_fragment");
 
         }
         if (v.getId() == btnVsPlayer.getId()) {

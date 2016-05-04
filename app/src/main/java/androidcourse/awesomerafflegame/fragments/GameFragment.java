@@ -26,7 +26,17 @@ import androidcourse.awesomerafflegame.sensors.ShakeSensor;
 public class GameFragment extends Fragment implements View.OnClickListener, ShakeSensor.OnShakeListener {
 
     private final int PLAYER_ONE = 1;
-    private final int COMPUTER = 2;
+    private final int PLAYER_TWO = 2;
+    private final int COMPUTER = 3;
+
+    private final int SWAP_TURNS = 10;
+    private final int LOST_ALL_POINTS = 11;
+    private final int LOST_POINTS_FOR_ROUND = 12;
+
+    public static final int VS_PLAYER = 20;
+    public static final int VS_COMPUTER = 21;
+
+    private final String TAG_VERSUS = "versus";
 
     private ShakeSensor shakeSensor;
 
@@ -47,6 +57,15 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     private int computerTotalScore;
     private int roundScore;
 
+    public static GameFragment newInstance(int versus) {
+        Bundle args = new Bundle();
+        args.putInt(TAG_VERSUS, versus);
+
+        GameFragment fragment = new GameFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,6 +75,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         this.shakeSensor.setOnShakeListener(this);
 
         currentPlayer = PLAYER_ONE;
+        // Perhaps get players real name
         currentPlayerName = "Player 1";
 
         initTextViews(view);
@@ -156,12 +176,12 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     private void updatePlayerOneScore(int faceOne, int faceTwo) {
         if (faceOne == 1 && faceTwo == 1) {
             playerOneTotalScore = 0;
-            handOverDice("Player 1 lost all points. Handing over dice");
+            handOverDice(LOST_ALL_POINTS);
         } else if (faceOne == 1 ^ faceTwo == 1) {
             if (!(roundScore < 0)) {
                 playerOneTotalScore -= roundScore;
             }
-            handOverDice("Player 1 lost points for this round. Handing over dice");
+            handOverDice(LOST_POINTS_FOR_ROUND);
         } else {
             roundScore += (faceOne + faceTwo);
             playerOneTotalScore += (faceOne + faceTwo);
@@ -178,12 +198,12 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     private void updateComputerScore(int faceOne, int faceTwo) {
         if (faceOne == 1 && faceTwo == 1) {
             computerTotalScore = 0;
-            handOverDice("The computer lost all points. Handing over dice");
+            handOverDice(LOST_ALL_POINTS);
         } else if (faceOne == 1 ^ faceTwo == 1) {
             if (!(roundScore < 0)) {
                 computerTotalScore -= roundScore;
             }
-            handOverDice("The computer lost points for this round. Handing over dice");
+            handOverDice(LOST_POINTS_FOR_ROUND);
         } else {
             roundScore += (faceOne + faceTwo);
             computerTotalScore += (faceOne + faceTwo);
@@ -199,22 +219,35 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         tvComputerScore.setText(Integer.toString(computerTotalScore));
     }
 
-    private void handOverDice(String announcement) {
+    private void handOverDice(int announcement) {
         roundScore = 0;
         tvRoundScore.setText("0");
 
-        tvAnnouncement.setText(announcement);
+        if (announcement == SWAP_TURNS) {
+            tvAnnouncement.setText("Handing over dice");
+        } else if (announcement == LOST_POINTS_FOR_ROUND) {
+            tvAnnouncement.setText(String.format("%s lost points for this round. Handing over dice", currentPlayerName));
+        } else if (announcement == LOST_ALL_POINTS) {
+            tvAnnouncement.setText(String.format("%s lost all points. Handing over dice", currentPlayerName));
+        }
 
         if (currentPlayer == PLAYER_ONE) {
-            currentPlayer = COMPUTER;
-            currentPlayerName = "Computer";
+            if(getArguments().getInt(TAG_VERSUS) == VS_COMPUTER) {
+                currentPlayer = COMPUTER;
+                currentPlayerName = "Computer";
+            } else {
+                currentPlayer = PLAYER_TWO;
+                currentPlayerName = "Player 2";
+            }
         } else {
             currentPlayer = PLAYER_ONE;
             currentPlayerName = "Player 1";
+            // Release sensor to user after computer turn ends
             shakeSensor.enable();
         }
 
-        tvCurrentPlayer.setText(currentPlayerName + " has the dice");
+
+        tvCurrentPlayer.setText(String.format("%s has the dice", currentPlayerName));
 
         if (currentPlayer == COMPUTER) {
             doComputerTurn();
@@ -222,6 +255,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     }
 
     private void doComputerTurn() {
+        // Prevent user from shaking device while computer is rolling
         shakeSensor.disable();
 
         Handler handler = new Handler();
@@ -229,7 +263,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
             @Override
             public void run() {
                 if (roundScore > 20) {
-                    handOverDice("Handing over dice");
+                    handOverDice(SWAP_TURNS);
                 } else {
                     shakeSensor.doShake();
                 }
@@ -240,7 +274,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     @Override
     public void onClick(View v) {
         if (v.getId() == bHandOverDice.getId()) {
-            handOverDice("Handing over dice");
+            handOverDice(SWAP_TURNS);
         }
     }
 
