@@ -19,6 +19,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -47,48 +49,111 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
 
     private Button btnVsComputer;
     private Button btnVsPlayer;
+    private Button btnListen;
+    private Button btnScan;
+    private LinearLayout blueLayout;
+
+    private EditText tryText;
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bluetooth, container, false);
+
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
         btnVsComputer = (Button) view.findViewById(R.id.btnVsComputer);
         btnVsComputer.setOnClickListener(this);
         btnVsPlayer = (Button) view.findViewById(R.id.btnVsPlayer);
         btnVsPlayer.setOnClickListener(this);
+        btnListen = (Button) view.findViewById(R.id.btnListen);
+        btnListen.setOnClickListener(this);
+        btnScan = (Button) view.findViewById(R.id.btnScan);
+        btnScan.setOnClickListener(this);
+        blueLayout = (LinearLayout) view.findViewById(R.id.blueLayout);
+
+        tryText = (EditText) view.findViewById(R.id.editText);
+
         return view;
+    }
+
+    private void setUpProgressBar(){
+
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == btnVsComputer.getId()) {
+            if (blueLayout.getVisibility() == View.VISIBLE) {
+                blueLayout.setVisibility(View.GONE);
+            }
+            FragmentController.get().transactFragments(getActivity(), new GameFragment(), "game_fragment");
+
+        }
+        if (v.getId() == btnVsPlayer.getId()) {
+            checkBluetoothStatus();
+            if (blueLayout.getVisibility() == View.GONE) {
+                blueLayout.setVisibility(View.VISIBLE);
+            }
+        }
+        if (v.getId() == btnListen.getId()) {
+            enableBluetooth();
+        }
+        if (v.getId() == btnScan.getId()) {
+            if (bluetoothAdapter != null) {
+                bluetoothAdapter.startDiscovery();
+            }
+        }
+    }
+
+    private void checkBluetoothStatus() {
+        //Check the system status
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            Toast.makeText(getActivity(), "Bluetooth is not supported.", Toast.LENGTH_SHORT).show();
+            if (blueLayout.getVisibility() == View.VISIBLE) {
+                blueLayout.setVisibility(View.GONE);
+            }
+            return;
+        }
+        if (!bluetoothAdapter.isEnabled()) {
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableIntent, REQUEST_ENABLE);
+        }
+
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PreGameFragment.REQUEST_ENABLE_BT && resultCode == Activity.RESULT_OK) {
-            BluetoothAdapter BT = BluetoothAdapter.getDefaultAdapter();
-            String address = BT.getAddress();
-            String name = BT.getName();
-            String toastText = name + " : " + address;
-            Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
-            //Giv en ting tilbage til bluetooth handler.
-        } else if (requestCode == PreGameFragment.REQUEST_ENABLE_BT && resultCode == Activity.RESULT_CANCELED) {
-            //BRUGER SAGDE NEJ TAK TIL AT SLÅ BLUETOOTH TIL.
-        }
-    }
-
-
-    public void setUpBluetooth() {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null) {
-            Toast.makeText(getActivity(), "Your device does not support bluetooth", Toast.LENGTH_SHORT).show();
-        } else {
-            enableBluetooth();
+        switch (requestCode) {
+            case REQUEST_ENABLE:
+                if (resultCode != Activity.RESULT_OK) {
+                    Log.d(DEBUG_TAG, "Enable: " + resultCode);
+                    Toast.makeText(getActivity(), "Bluetooth Not Enabled.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                break;
+            case REQUEST_DISCOVERABLE:
+                if (resultCode == Activity.RESULT_CANCELED) {
+                    Log.d(DEBUG_TAG, "Cancelled: " + resultCode);
+                    Toast.makeText(getActivity(), "Must be discoverable.", Toast.LENGTH_SHORT).show();
+                } else {
+                    startListening();
+                }
+                break;
+            default:
+                break;
         }
     }
 
     public void enableBluetooth() {
-        if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled()) {
-            Intent disIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-            disIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-            startActivityForResult(disIntent, PreGameFragment.REQUEST_ENABLE_BT);
+        if (bluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+            startActivityForResult(discoverableIntent, REQUEST_DISCOVERABLE);
+            return;
         }
         startListening();
     }
@@ -125,28 +190,20 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == btnVsComputer.getId()) {
-            FragmentController.get().transactFragments(getActivity(), new GameFragment(), "game_fragment");
-        }
-        if (v.getId() == btnVsPlayer.getId()) {
-            setUpBluetooth();
-        }
-    }
-
     private class AcceptTask extends AsyncTask<UUID, Void, BluetoothSocket> {
         @Override
         protected BluetoothSocket doInBackground(UUID... params) {
             String name = bluetoothAdapter.getName();
+            Log.d(DEBUG_TAG, "Name: " + name);
             try {
                 //While listening, set the discovery name to
                 // a specific value
                 bluetoothAdapter.setName(SEARCH_NAME);
-                BluetoothServerSocket socket = bluetoothAdapter.listenUsingRfcommWithServiceRecord("BluetoothRecipe", params[0]);
+                BluetoothServerSocket socket = bluetoothAdapter.listenUsingRfcommWithServiceRecord("Awesome_raffle_game", params[0]);
                 BluetoothSocket connected = socket.accept();
                 //Reset the BT adapter name
                 bluetoothAdapter.setName(name);
+                Log.d(DEBUG_TAG, "Accepttask: " + socket.toString());
                 return connected;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -169,14 +226,13 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
     private class ConnectedTask extends
             AsyncTask<BluetoothSocket, Void, String> {
         @Override
-        protected String doInBackground(
-                BluetoothSocket... params) {
+        protected String doInBackground(BluetoothSocket... params) {
             InputStream in = null;
             OutputStream out = null;
             try {
                 //Send your data
                 out = params[0].getOutputStream();
-                String email = "HEJ";
+                String email = "Hej";
                 out.write(email.getBytes());
                 //Receive the other's data
                 in = params[0].getInputStream();
@@ -186,6 +242,7 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
                 String result = new String(buffer);
                 //Close the connection
                 bluetoothSocket.close();
+                Log.d(DEBUG_TAG, "Result : " + result);
                 return result.trim();
             } catch (Exception exc) {
                 return null;
@@ -225,8 +282,7 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
                     }
                 }
                 //When discovery is complete
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED
-                    .equals(action)) {
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Toast.makeText(getActivity(), "Fundet", Toast.LENGTH_LONG).show();
             }
         }
