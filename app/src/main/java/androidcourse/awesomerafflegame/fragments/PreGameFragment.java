@@ -75,10 +75,6 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
-    private void setUpProgressBar() {
-
-    }
-
 
     @Override
     public void onClick(View v) {
@@ -252,8 +248,7 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
 
         @Override
         protected void onPostExecute(String result) {
-            Toast.makeText(getActivity(), result,
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
         }
     }
 
