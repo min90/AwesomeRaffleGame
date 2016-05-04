@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -26,7 +25,6 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
 
     private ShakeSensor shakeSensor;
 
-    private ImageView imgDice, imgDice2;
     private AnimationDrawable diceAnim, diceAnim2;
 
     @Nullable
@@ -37,17 +35,67 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         this.shakeSensor = new ShakeSensor(getActivity());
         this.shakeSensor.setOnShakeListener(this);
 
-        imgDice = (ImageView) view.findViewById(R.id.img_dice);
+        ImageView imgDice = (ImageView) view.findViewById(R.id.img_dice);
         imgDice.setBackgroundResource(R.drawable.anim_dice_1to6);
         diceAnim = (AnimationDrawable) imgDice.getBackground();
         diceAnim.selectDrawable(new Random().nextInt(6));
 
-        imgDice2 = (ImageView) view.findViewById(R.id.img_dice_2);
+        ImageView imgDice2 = (ImageView) view.findViewById(R.id.img_dice_2);
         imgDice2.setBackgroundResource(R.drawable.anim_dice_3to2);
         diceAnim2 = (AnimationDrawable) imgDice2.getBackground();
         diceAnim2.selectDrawable(new Random().nextInt(6));
 
         return view;
+    }
+
+    private void resetDice() {
+        diceAnim.stop();
+        diceAnim2.stop();
+        diceAnim.selectDrawable(0);
+        diceAnim2.selectDrawable(0);
+    }
+
+    private void rollDice(int duration) {
+        diceAnim.start();
+        diceAnim2.start();
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                stopDice();
+            }
+        }, duration);
+    }
+
+    private void vibrateDevice(int ms) {
+        Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        v.vibrate(ms);
+    }
+
+    private void stopDice() {
+        int face = new Random().nextInt(6);
+        int face2 = new Random().nextInt(6);
+
+        diceAnim.stop();
+        diceAnim.selectDrawable(face);
+        diceAnim2.stop();
+        switch (face2 - 2) {
+            case -2:
+                diceAnim2.selectDrawable(4);
+                break;
+            case -1:
+                diceAnim2.selectDrawable(5);
+                break;
+            default:
+                diceAnim2.selectDrawable(face2 - 2);
+                break;
+        }
+
+        Toast.makeText(
+                getActivity(),
+                "Du slog en " + (face + 1) + "'er og en " + (face2 + 1) + "'er",
+                Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -56,43 +104,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
 
     @Override
     public void onShake(int count) {
-        diceAnim.stop();
-        diceAnim2.stop();
-        diceAnim.selectDrawable(0);
-        diceAnim2.selectDrawable(0);
-        Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-        v.vibrate(1000);
-        diceAnim.start();
-        diceAnim2.start();
-
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                int face = new Random().nextInt(6);
-                int face2 = new Random().nextInt(6);
-
-                diceAnim.stop();
-                diceAnim2.stop();
-                diceAnim.selectDrawable(face);
-                switch (face2 - 2) {
-                    case -2:
-                        diceAnim2.selectDrawable(4);
-                        break;
-                    case -1:
-                        diceAnim2.selectDrawable(5);
-                        break;
-                    default:
-                        diceAnim2.selectDrawable(face2 - 2);
-                        break;
-                }
-
-                Toast.makeText(
-                        getActivity(),
-                        "Du slog en " + (face + 1) + "'er og en " + (face2 + 1) + "'er",
-                        Toast.LENGTH_SHORT).show();
-            }
-        }, 1000);
+        resetDice();
+        vibrateDevice(1000);
+        rollDice(1000);
     }
 
     @Override
