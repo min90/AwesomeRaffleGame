@@ -1,6 +1,5 @@
 package androidcourse.awesomerafflegame.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidcourse.awesomerafflegame.BluetoothHandler;
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.domain.FragmentController;
 
@@ -65,17 +63,8 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
-    private void createBluetooth() {
-        BluetoothHandler bluetoothHandler = new BluetoothHandler(getActivity());
-        Intent intent = bluetoothHandler.enableBluetooth();
-        if (intent != null) {
-            startActivityForResult(intent, BluetoothHandler.REQUEST_ENABLE_BT);
-        }
-    }
-
     private void startGame() {
-        createBluetooth();
-        FragmentController.get().transactFragments(getActivity(), new GameFragment(), "game_fragment");
+        FragmentController.get().transactFragments(getActivity(), new PreGameFragment(), "game_fragment");
     }
 
     private void about() {
@@ -85,11 +74,9 @@ public class StartFragment extends Fragment implements View.OnClickListener {
 
     private void results() {
         if (name != null) {
-            Log.d(DEBUG_TAG, "Hejsa");
             Fragment resultFragment = ResultFragment.newInstance(name);
             FragmentController.get().transactFragments(getActivity(), resultFragment, "result_Fragment");
         } else {
-            Log.d(DEBUG_TAG, "Hejsa ikke");
             Fragment resultFragment = ResultFragment.newInstance("Jesper");
             FragmentController.get().transactFragments(getActivity(), resultFragment, "result_Fragment");
         }
