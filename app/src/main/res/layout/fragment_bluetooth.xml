@@ -19,6 +19,13 @@
         android:layout_gravity="center_horizontal"
         android:layout_weight="1" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/testTxtView"
+        android:layout_weight="1"
+        android:hint="Her kommer tekst fra anden enhed" />
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"

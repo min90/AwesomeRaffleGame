@@ -2,6 +2,7 @@ package androidcourse.awesomerafflegame;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -55,7 +56,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
+        Log.d(DEBUG_TAG, "Result: " + resultCode + " Request: " + requestCode + " Data: " + data.toString());
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        fragment.onActivityResult(requestCode, resultCode, data);
     }
 
     private void createLogin() {
@@ -127,7 +132,6 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -54,7 +54,6 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
     private LinearLayout blueLayout;
 
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -71,7 +70,7 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
         btnScan = (Button) view.findViewById(R.id.btnScan);
         btnScan.setOnClickListener(this);
         blueLayout = (LinearLayout) view.findViewById(R.id.blueLayout);
-        
+
         return view;
     }
 
@@ -259,16 +258,12 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
             // When discovery finds a device
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Get the BluetoothDevice object from the Intent
-                BluetoothDevice device =
-                        intent.getParcelableExtra(
-                                BluetoothDevice.EXTRA_DEVICE);
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (TextUtils.equals(device.getName(), SEARCH_NAME)) {
                     //Matching device found, connect
                     bluetoothAdapter.cancelDiscovery();
                     try {
-                        bluetoothSocket = device
-                                .createRfcommSocketToServiceRecord(
-                                        UUID_TAG);
+                        bluetoothSocket = device.createRfcommSocketToServiceRecord(UUID_TAG);
                         bluetoothSocket.connect();
                         ConnectedTask task = new ConnectedTask();
                         task.execute(bluetoothSocket);
