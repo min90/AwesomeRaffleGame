@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +15,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.lang.reflect.Method;
 import java.util.Random;
 
 import androidcourse.awesomerafflegame.R;
+import androidcourse.awesomerafflegame.models.Game;
+import androidcourse.awesomerafflegame.persistence.DatabaseHandler;
 import androidcourse.awesomerafflegame.sensors.ShakeSensor;
 
 /**
@@ -44,7 +46,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
 
     private TextView tvCurrentPlayer;
     private TextView tvPlayerOneScore;
-    private TextView tvComputerScore;
+    private TextView tvOpponentScore;
     private TextView tvRoundScore;
     private TextView tvAnnouncement;
 
@@ -54,7 +56,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     private String currentPlayerName;
 
     private int playerOneTotalScore;
-    private int computerTotalScore;
+    private int opponentTotalScore;
     private int roundScore;
 
     public static GameFragment newInstance(int versus) {
@@ -95,7 +97,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         tvCurrentPlayer = (TextView) view.findViewById(R.id.tv_current_player);
 
         tvPlayerOneScore = (TextView) view.findViewById(R.id.player_one_score);
-        tvComputerScore = (TextView) view.findViewById(R.id.computer_score);
+        tvOpponentScore = (TextView) view.findViewById(R.id.opponent_score);
 
         tvRoundScore = (TextView) view.findViewById(R.id.round_score);
 
@@ -188,6 +190,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
             if (playerOneTotalScore >= 100) {
                 playerOneTotalScore = 100;
                 tvAnnouncement.setText("Player 1 won!");
+                endGame(PLAYER_ONE);
             }
         }
 
@@ -197,26 +200,27 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
 
     private void updateComputerScore(int faceOne, int faceTwo) {
         if (faceOne == 1 && faceTwo == 1) {
-            computerTotalScore = 0;
+            opponentTotalScore = 0;
             handOverDice(LOST_ALL_POINTS);
         } else if (faceOne == 1 ^ faceTwo == 1) {
             if (!(roundScore < 0)) {
-                computerTotalScore -= roundScore;
+                opponentTotalScore -= roundScore;
             }
             handOverDice(LOST_POINTS_FOR_ROUND);
         } else {
             roundScore += (faceOne + faceTwo);
-            computerTotalScore += (faceOne + faceTwo);
-            if (computerTotalScore >= 100) {
-                computerTotalScore = 100;
+            opponentTotalScore += (faceOne + faceTwo);
+            if (opponentTotalScore >= 100) {
+                opponentTotalScore = 100;
                 tvAnnouncement.setText("Computer won!");
+                endGame(COMPUTER);
             } else {
                 doComputerTurn();
             }
         }
 
         tvRoundScore.setText(Integer.toString(roundScore));
-        tvComputerScore.setText(Integer.toString(computerTotalScore));
+        tvOpponentScore.setText(Integer.toString(opponentTotalScore));
     }
 
     private void handOverDice(int announcement) {
@@ -232,7 +236,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         }
 
         if (currentPlayer == PLAYER_ONE) {
-            if(getArguments().getInt(TAG_VERSUS) == VS_COMPUTER) {
+            if (getArguments().getInt(TAG_VERSUS) == VS_COMPUTER) {
                 currentPlayer = COMPUTER;
                 currentPlayerName = "Computer";
             } else {
@@ -269,6 +273,35 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
                 }
             }
         }, 1000);
+    }
+
+    private void endGame(int winner) {
+        Game game = new Game();
+
+        switch (getArguments().getInt(TAG_VERSUS)) {
+            case VS_PLAYER:
+                game.setOpponent("Player 2");
+                break;
+            case VS_COMPUTER:
+                game.setOpponent("Computer");
+                break;
+        }
+
+        switch (winner) {
+            case PLAYER_ONE:
+                game.setWinner("Player 1");
+                break;
+            case PLAYER_TWO:
+                game.setWinner("Player 2");
+                break;
+            case COMPUTER:
+                game.setWinner("Computer");
+        }
+
+        game.setPlayerScore(playerOneTotalScore);
+        game.setOpponentScore(opponentTotalScore);
+
+        new DatabaseHandler(getActivity()).saveGame(game);
     }
 
     @Override
