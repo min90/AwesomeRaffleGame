@@ -3,7 +3,6 @@ package androidcourse.awesomerafflegame.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,10 +72,10 @@ public class StartFragment extends Fragment implements View.OnClickListener {
 
     private void results() {
         if (name != null) {
-            Fragment resultFragment = ResultFragment.newInstance(name);
+            Fragment resultFragment = ScoresFragment.newInstance(name);
             FragmentController.get().transactFragments(getActivity(), resultFragment, "result_Fragment");
         } else {
-            Fragment resultFragment = ResultFragment.newInstance("Jesper");
+            Fragment resultFragment = ScoresFragment.newInstance("Jesper");
             FragmentController.get().transactFragments(getActivity(), resultFragment, "result_Fragment");
         }
     }
