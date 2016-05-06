@@ -1,4 +1,4 @@
-package androidcourse.awesomerafflegame;
+package androidcourse.awesomerafflegame.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,7 +24,8 @@ import com.facebook.login.widget.LoginButton;
 
 import java.util.Arrays;
 
-import androidcourse.awesomerafflegame.domain.FragmentController;
+import androidcourse.awesomerafflegame.R;
+import androidcourse.awesomerafflegame.controllers.FragmentController;
 import androidcourse.awesomerafflegame.fragments.StartFragment;
 
 public class MainActivity extends AppCompatActivity {

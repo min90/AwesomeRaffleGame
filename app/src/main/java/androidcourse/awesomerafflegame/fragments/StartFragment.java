@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidcourse.awesomerafflegame.R;
-import androidcourse.awesomerafflegame.domain.FragmentController;
+import androidcourse.awesomerafflegame.controllers.FragmentController;
 
 /**
  * Created by Jesper on 04/04/16.

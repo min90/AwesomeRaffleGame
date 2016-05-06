@@ -1,4 +1,4 @@
-package androidcourse.awesomerafflegame.domain;
+package androidcourse.awesomerafflegame.controllers;
 
 import android.app.Activity;
 import android.support.v4.app.Fragment;
@@ -8,7 +8,7 @@ import android.support.v4.app.FragmentTransaction;
 
 import java.lang.ref.WeakReference;
 
-import androidcourse.awesomerafflegame.MainActivity;
+import androidcourse.awesomerafflegame.activities.MainActivity;
 import androidcourse.awesomerafflegame.R;
 
 /**

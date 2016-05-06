@@ -25,7 +25,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidcourse.awesomerafflegame.R;
+import androidcourse.awesomerafflegame.activities.DeviceListActivity;
 import androidcourse.awesomerafflegame.adapters.Constants;
+import androidcourse.awesomerafflegame.controllers.FragmentController;
 import androidcourse.awesomerafflegame.sensors.BluetoothGameService;
 
 /**
@@ -141,7 +143,7 @@ public class GameSetUpFragment extends Fragment implements View.OnClickListener 
         }
     }
 
-    private void setupGame(){
+    private void setupGame() {
         Log.d(DEBUG_TAG, "SetupGame");
 
         bluetoothGameService = new BluetoothGameService(getActivity(), handler);
@@ -351,10 +353,10 @@ public class GameSetUpFragment extends Fragment implements View.OnClickListener 
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == btnVsPlayer.getId()){
+        if (v.getId() == btnVsPlayer.getId()) {
             setupGame();
         }
-        if(v.getId() == btnVsComputer.getId()) {
+        if (v.getId() == btnVsComputer.getId()) {
             sendMessage("Hejsa Mads");
         }
     }

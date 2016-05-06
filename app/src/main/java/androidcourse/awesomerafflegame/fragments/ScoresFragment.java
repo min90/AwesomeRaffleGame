@@ -6,19 +6,22 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Collections;
 import java.util.List;
 
 
 import androidcourse.awesomerafflegame.R;
+import androidcourse.awesomerafflegame.adapters.DividerItemDecoration;
 import androidcourse.awesomerafflegame.adapters.GameRCVAdapter;
 import androidcourse.awesomerafflegame.models.Game;
 import androidcourse.awesomerafflegame.persistence.DatabaseHandler;
 
 /**
- * Created by Jesper on 30/04/16.
+ * Created by Mads on 30/04/16.
  */
 public class ScoresFragment extends Fragment {
     public static final String DEBUG_TAG = ScoresFragment.class.getSimpleName();
@@ -41,6 +44,9 @@ public class ScoresFragment extends Fragment {
 
         List<Game> games = new DatabaseHandler(getActivity()).getAllGames();
 
+        //reverse the list to show newest games first
+        Collections.reverse(games);
+
         setUpRecyclerView(games, view);
         return view;
     }
@@ -50,5 +56,6 @@ public class ScoresFragment extends Fragment {
         gamesRCV.setLayoutManager(new LinearLayoutManager(getActivity()));
         gamesRCV.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         gamesRCV.setAdapter(new GameRCVAdapter(getActivity(), games));
+
     }
 }

@@ -1,4 +1,4 @@
-package androidcourse.awesomerafflegame.fragments;
+package androidcourse.awesomerafflegame.adapters;
 
 import android.content.Context;
 import android.content.res.TypedArray;

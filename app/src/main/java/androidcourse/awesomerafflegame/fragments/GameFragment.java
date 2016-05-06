@@ -23,7 +23,7 @@ import androidcourse.awesomerafflegame.persistence.DatabaseHandler;
 import androidcourse.awesomerafflegame.sensors.ShakeSensor;
 
 /**
- * Created by Jesper on 01/05/16.
+ * Created by Mads on 01/05/16.
  */
 public class GameFragment extends Fragment implements View.OnClickListener, ShakeSensor.OnShakeListener {
 
@@ -246,8 +246,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         } else {
             currentPlayer = PLAYER_ONE;
             currentPlayerName = "Player 1";
-            // Release sensor to user after computer turn ends
+            // Release sensor and buttons to user after computer turn ends
             shakeSensor.enable();
+            bHandOverDice.setEnabled(true);
         }
 
 
@@ -259,8 +260,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     }
 
     private void doComputerTurn() {
-        // Prevent user from shaking device while computer is rolling
+        // Prevent user from interrupting while computer is rolling
         shakeSensor.disable();
+        bHandOverDice.setEnabled(false);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
