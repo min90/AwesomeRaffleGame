@@ -162,6 +162,7 @@ public class GameSetUpFragment extends Fragment implements View.OnClickListener 
 
         // Check that there's actually something to send
         if (message.length() > 0) {
+            Log.d(DEBUG_TAG, "Message: " + message);
             // Get the message bytes and tell the BluetoothChatService to write
             byte[] send = message.getBytes();
             bluetoothGameService.write(send);
@@ -307,7 +308,6 @@ public class GameSetUpFragment extends Fragment implements View.OnClickListener 
                     switch (msg.arg1) {
                         case BluetoothGameService.STATE_CONNECTED:
                             setStatus(getString(R.string.title_connected_to, connectedDeviceName));
-                            gameArrayAdapter.clear();
                             break;
                         case BluetoothGameService.STATE_CONNECTING:
                             setStatus(R.string.title_connecting);

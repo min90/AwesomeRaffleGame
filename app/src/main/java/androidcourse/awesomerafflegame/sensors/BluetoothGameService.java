@@ -75,7 +75,7 @@ public class BluetoothGameService {
      * session in listening (server) mode. Called by the Activity onResume()
      */
     public synchronized void start() {
-        Log.d(DEBUG_TAG, "start");
+        Log.d(DEBUG_TAG, "Starting game service");
 
         // Cancel any thread attempting to make a connection
         if (connectThread != null) {
@@ -109,7 +109,7 @@ public class BluetoothGameService {
      * @param secure Socket Security type - Secure (true) , Insecure (false)
      */
     public synchronized void connect(BluetoothDevice device, boolean secure) {
-        Log.d(DEBUG_TAG, "connect to: " + device);
+        Log.d(DEBUG_TAG, "Connect to: " + device);
 
         // Cancel any thread attempting to make a connection
         if (state == STATE_CONNECTING) {
@@ -226,7 +226,7 @@ public class BluetoothGameService {
     /**
      * Indicate that the connection attempt failed and notify the UI Activity.
      */
-    private void connectionFailed(){
+    private void connectionFailed() {
         // Send a failure message back to the game
         Message message = handler.obtainMessage(Constants.MESSAGE_TOAST);
         Bundle args = new Bundle();
@@ -242,7 +242,7 @@ public class BluetoothGameService {
     /**
      * Indicate that the connection was lost and notify the UI Activity.
      */
-    private void connectionLost(){
+    private void connectionLost() {
         // Send a failure message back to the game
         Message message = handler.obtainMessage(Constants.MESSAGE_TOAST);
         Bundle args = new Bundle();
@@ -280,7 +280,7 @@ public class BluetoothGameService {
 
         public void run() {
             Log.d(DEBUG_TAG, "Socket type: " + socketType + " BEGIN Acceptthread " + this);
-            setName("Accepthread: " + socketType);
+            setName("AcceptThread: " + socketType);
 
             BluetoothSocket socket;
 
@@ -290,7 +290,7 @@ public class BluetoothGameService {
                     // successful connection or an exception
                     socket = serverSocket.accept();
                 } catch (IOException ex) {
-                    Log.d(DEBUG_TAG, "Error listening to socket in run: " + socketType + " " + "failed");
+                    Log.e(DEBUG_TAG, "Socket Type: " + socketType + "accept() failed", ex);
                     break;
                 }
 
@@ -315,7 +315,7 @@ public class BluetoothGameService {
                     }
                 }
             }
-            Log.d(DEBUG_TAG, "Ended Acceptthread type: " + socketType);
+            Log.d(DEBUG_TAG, "Ended Accept thread type: " + socketType);
         }
 
         public void cancel() {
@@ -342,8 +342,10 @@ public class BluetoothGameService {
             // given BluetoothDevice
             try {
                 if (secure) {
+                    Log.d(DEBUG_TAG, "Creating secure socket");
                     tmpSocket = device.createRfcommSocketToServiceRecord(UUID_SECURE);
                 } else {
+                    Log.d(DEBUG_TAG, "Creating insecure socket");
                     tmpSocket = device.createInsecureRfcommSocketToServiceRecord(UUID_INSECURE);
                 }
             } catch (IOException ex) {
@@ -365,6 +367,7 @@ public class BluetoothGameService {
                 socket.connect();
 
             } catch (IOException ex) {
+                Log.d(DEBUG_TAG, "Not able to start the socket: " + ex.getLocalizedMessage());
                 // Close the socket
                 try {
                     socket.close();
@@ -384,10 +387,10 @@ public class BluetoothGameService {
             connected(socket, device, socketType);
         }
 
-        public void cancel(){
+        public void cancel() {
             try {
                 socket.close();
-            } catch (IOException ex){
+            } catch (IOException ex) {
                 Log.e(DEBUG_TAG, "close() of connect " + socketType + " socket failed");
             }
         }
@@ -410,26 +413,27 @@ public class BluetoothGameService {
             OutputStream tmpOutputStream = null;
 
             //Get the bluetoothsocket input and output streams
-
-            try{
+            try {
+                Log.d(DEBUG_TAG, "Socket: " + socket.getOutputStream().toString());
+                Log.d(DEBUG_TAG, "Socket: " + socket.getInputStream().toString());
                 tmpInputStream = socket.getInputStream();
                 tmpOutputStream = socket.getOutputStream();
-            } catch (IOException ex){
-                Log.e(DEBUG_TAG, "temporary sockets not created");
+            } catch (IOException ex) {
+                Log.e(DEBUG_TAG, "temporary sockets not created", ex);
             }
 
             outputStream = tmpOutputStream;
             inputStream = tmpInputStream;
         }
 
-        public void run(){
+        public void run() {
             Log.i(DEBUG_TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
             int bytes;
 
             //Keep listening to the Inputstream while connected;
-            while(state == STATE_CONNECTED){
-                try{
+            while (state == STATE_CONNECTED) {
+                try {
                     //Read from the inputstream;
                     bytes = inputStream.read(buffer);
 
@@ -437,7 +441,8 @@ public class BluetoothGameService {
                     handler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
 
                 } catch (IOException ex) {
-                    Log.e(DEBUG_TAG, "disconnected");
+                    Log.e(DEBUG_TAG, "disconnected " + ex.getLocalizedMessage());
+                    ex.printStackTrace();
                     connectionLost();
                     // Start the service over to restart listening mode
                     BluetoothGameService.this.start();
@@ -451,21 +456,24 @@ public class BluetoothGameService {
          *
          * @param buffer The bytes to write
          */
-        public void write(byte[] buffer){
+        public void write(byte[] buffer) {
             try {
+                Log.d(DEBUG_TAG, "Buffer " + new String(buffer));
                 outputStream.write(buffer);
 
                 // Share the sent message back to the UI Activity
+                Log.d(DEBUG_TAG, "Buffer 2" + new String(buffer));
                 handler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer).sendToTarget();
-            } catch (IOException ex){
-                Log.e(DEBUG_TAG, "Exception during write");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                Log.e(DEBUG_TAG, "Exception during write " + ex.getLocalizedMessage());
             }
         }
 
-        public void cancel(){
+        public void cancel() {
             try {
                 socket.close();
-            } catch (IOException ex){
+            } catch (IOException ex) {
                 Log.e(DEBUG_TAG, "close() of connect socket failed");
             }
         }
