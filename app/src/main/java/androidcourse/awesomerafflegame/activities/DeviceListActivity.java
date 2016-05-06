@@ -1,4 +1,4 @@
-package androidcourse.awesomerafflegame.fragments;
+package androidcourse.awesomerafflegame.activities;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;

@@ -1,4 +1,4 @@
-package androidcourse.awesomerafflegame;
+package androidcourse.awesomerafflegame.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,7 +24,8 @@ import com.facebook.login.widget.LoginButton;
 
 import java.util.Arrays;
 
-import androidcourse.awesomerafflegame.domain.FragmentController;
+import androidcourse.awesomerafflegame.R;
+import androidcourse.awesomerafflegame.controllers.FragmentController;
 import androidcourse.awesomerafflegame.fragments.StartFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -58,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
-        Log.d(DEBUG_TAG, "Result: " + resultCode + " Request: " + requestCode + " Data: " + data.toString());
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         fragment.onActivityResult(requestCode, resultCode, data);
     }
