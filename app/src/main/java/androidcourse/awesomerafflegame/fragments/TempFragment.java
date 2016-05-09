@@ -14,9 +14,6 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -162,7 +159,7 @@ public class TempFragment extends Fragment implements View.OnClickListener {
     /**
      * Set up the UI and background operations for chat.
      */
-    private void setupGame() {
+    public void setupGame() {
         Log.d(TAG, "setupGame()");
 
         // Initialize the BluetoothChatService to perform bluetooth connections
@@ -192,7 +189,7 @@ public class TempFragment extends Fragment implements View.OnClickListener {
     public void sendMessage(String message) {
         // Check that we're actually connected before trying anything
         if (mGameService.getState() != BluetoothGameService.STATE_CONNECTED) {
-            Toast.makeText(getActivity(), R.string.not_connected, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), R.string.not_connected, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -285,6 +282,7 @@ public class TempFragment extends Fragment implements View.OnClickListener {
                     // construct a string from the valid bytes in the buffer
                     msgReceivedListener.onMessageReceived();
                     String readMessage = new String(readBuf, 0, msg.arg1);
+                    Log.d("MSG RECEIVED", readMessage);
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name

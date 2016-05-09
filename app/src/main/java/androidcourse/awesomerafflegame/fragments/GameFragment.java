@@ -82,6 +82,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
 
         this.bluetoothFragment = new TempFragment();
         this.bluetoothFragment.setOnMessageReceivedListener(this);
+        this.bluetoothFragment.setupGame();
 
         currentPlayer = PLAYER_ONE;
         // Perhaps get players real name
