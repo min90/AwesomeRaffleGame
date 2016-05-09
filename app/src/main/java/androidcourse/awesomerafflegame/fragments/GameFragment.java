@@ -260,8 +260,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
             shakeSensor.enable();
             bHandOverDice.setEnabled(true);
         }
-
-
+        
         tvCurrentPlayer.setText(String.format("%s has the dice", currentPlayerName));
 
         if (currentPlayer == COMPUTER) {
