@@ -6,7 +6,6 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -15,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Random;
 
@@ -43,7 +41,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     private static final String TAG_VERSUS = "versus";
 
     private ShakeSensor shakeSensor;
-    private BluetoothHandler bluetoothFragment;
+    private BluetoothHandler bluetoothHandler;
 
     private AnimationDrawable dieOneAnimation, dieTwoAnimation;
 
@@ -71,7 +69,6 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         return fragment;
     }
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_game, container, false);
@@ -79,10 +76,11 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         this.shakeSensor = new ShakeSensor(getActivity());
         this.shakeSensor.setOnShakeListener(this);
 
-        this.bluetoothFragment = BluetoothHandler.get();
-        this.bluetoothFragment.setOnMessageReceivedListener(this);
+        bluetoothHandler = BluetoothHandler.get();
+        bluetoothHandler.setOnMessageReceivedListener(this);
 
         currentPlayer = PLAYER_ONE;
+
         // Perhaps get players real name
         currentPlayerName = "Player 1";
 
@@ -176,12 +174,14 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         int actualFaceOne = faceOne + 1;
         int actualFaceTwo = faceTwo + 1;
 
-        bluetoothFragment.sendMessage("Tis");
-
         if (currentPlayer == PLAYER_ONE) {
             updatePlayerOneScore(actualFaceOne, actualFaceTwo);
+            if (getArguments().getInt(TAG_VERSUS) == VS_PLAYER) {
+                // Playing via Bluetooth - send result to opponent
+                bluetoothHandler.sendMessage(actualFaceOne + "," + actualFaceTwo);
+            }
         } else {
-            updateComputerScore(actualFaceOne, actualFaceTwo);
+            updateOpponentScore(actualFaceOne, actualFaceTwo);
         }
     }
 
@@ -208,7 +208,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         tvPlayerOneScore.setText(Integer.toString(playerOneTotalScore));
     }
 
-    private void updateComputerScore(int faceOne, int faceTwo) {
+    private void updateOpponentScore(int faceOne, int faceTwo) {
         if (faceOne == 1 && faceTwo == 1) {
             opponentTotalScore = 0;
             handOverDice(LOST_ALL_POINTS);
@@ -368,8 +368,8 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     }
 
     @Override
-    public void onMessageReceived() {
-        Toast.makeText(getActivity(), "Vi fik en besked", Toast.LENGTH_SHORT).show();
+    public void onMessageReceived(String message) {
+        updateOpponentScore(Integer.parseInt(message.split(",")[0]), Integer.parseInt(message.split(",")[1]));
     }
 
     @Override

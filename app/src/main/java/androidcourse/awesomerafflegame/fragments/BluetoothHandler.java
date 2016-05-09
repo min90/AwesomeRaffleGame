@@ -1,38 +1,25 @@
 package androidcourse.awesomerafflegame.fragments;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.activities.DeviceListActivity;
 import androidcourse.awesomerafflegame.adapters.Constants;
-import androidcourse.awesomerafflegame.controllers.FragmentController;
 import androidcourse.awesomerafflegame.sensors.BluetoothGameService;
 
 /**
  * This fragment controls Bluetooth to communicate with other devices.
  */
-public class BluetoothHandler implements View.OnClickListener {
+public class BluetoothHandler {
 
     private static final String TAG = "BluetoothChatFragment";
 
@@ -49,11 +36,6 @@ public class BluetoothHandler implements View.OnClickListener {
      * Name of the connected device
      */
     private String mConnectedDeviceName = null;
-
-    /**
-     * String buffer for outgoing messages
-     */
-    private StringBuffer mOutStringBuffer;
 
     /**
      * Local Bluetooth adapter
@@ -122,7 +104,7 @@ public class BluetoothHandler implements View.OnClickListener {
     }
 
     public interface OnMessageReceivedListener {
-        void onMessageReceived();
+        void onMessageReceived(String message);
     }
 
     public void setOnMessageReceivedListener(OnMessageReceivedListener listener) {
@@ -137,9 +119,6 @@ public class BluetoothHandler implements View.OnClickListener {
 
         // Initialize the BluetoothChatService to perform bluetooth connections
         mGameService = new BluetoothGameService(context, mHandler);
-
-        // Initialize the buffer for outgoing messages
-        mOutStringBuffer = new StringBuffer("");
     }
 
     /**
@@ -154,11 +133,6 @@ public class BluetoothHandler implements View.OnClickListener {
         }
     }
 
-    /**
-     * Sends a message.
-     *
-     * @param message A string of text to send.
-     */
     public void sendMessage(String message) {
         // Check that we're actually connected before trying anything
         if (mGameService.getState() != BluetoothGameService.STATE_CONNECTED) {
@@ -174,24 +148,6 @@ public class BluetoothHandler implements View.OnClickListener {
         }
     }
 
-    /**
-     * The action listener for the EditText widget, to listen for the return key
-     */
-    private TextView.OnEditorActionListener mWriteListener
-            = new TextView.OnEditorActionListener() {
-        public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
-            // If the action is a key-up event on the return key, send the message
-            if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_UP) {
-                String message = view.getText().toString();
-                sendMessage(message);
-            }
-            return true;
-        }
-    };
-
-    /**
-     * The Handler that gets information back from the BluetoothGameService
-     */
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -199,16 +155,14 @@ public class BluetoothHandler implements View.OnClickListener {
             switch (msg.what) {
                 case Constants.MESSAGE_WRITE:
                     byte[] writeBuf = (byte[]) msg.obj;
-                    // construct a string from the buffer
                     String writeMessage = new String(writeBuf);
                     Log.d("MESSAGE_WRITE", writeMessage);
                     break;
                 case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
-                    msgReceivedListener.onMessageReceived();
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    Log.d("MSG RECEIVED", readMessage);
+                    msgReceivedListener.onMessageReceived(readMessage);
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name
@@ -271,11 +225,6 @@ public class BluetoothHandler implements View.OnClickListener {
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         // Attempt to connect to the device
         mGameService.connect(device, secure);
-    }
-
-    @Override
-    public void onClick(View v) {
-        //
     }
 
 }
