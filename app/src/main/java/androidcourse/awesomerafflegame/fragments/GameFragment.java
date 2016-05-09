@@ -1,12 +1,14 @@
 package androidcourse.awesomerafflegame.fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -137,8 +139,10 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     }
 
     private void vibrateDevice(int ms) {
-        Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-        v.vibrate(ms);
+        if (getActivity() != null) {
+            Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(ms);
+        }
     }
 
     private void stopDice() {
@@ -304,6 +308,43 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         game.setOpponentScore(opponentTotalScore);
 
         new DatabaseHandler(getActivity()).saveGame(game);
+        showEndOfGameDialog(game.getWinner());
+    }
+
+    private void showEndOfGameDialog(String winner) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+
+        dialog.setTitle("Game finished!");
+        dialog.setMessage(winner + " won! Play again?");
+
+        dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                resetGame();
+            }
+        });
+
+        dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //return to home
+            }
+        });
+
+        dialog.create();
+        dialog.show();
+    }
+
+    private void resetGame() {
+        playerOneTotalScore = 0;
+        opponentTotalScore = 0;
+        roundScore = 0;
+        tvPlayerOneScore.setText("0");
+        tvOpponentScore.setText("0");
+
+        if (currentPlayer == COMPUTER) {
+            handOverDice(SWAP_TURNS);
+        }
     }
 
     @Override

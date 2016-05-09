@@ -28,6 +28,7 @@ import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.activities.DeviceListActivity;
 import androidcourse.awesomerafflegame.adapters.Constants;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
+import androidcourse.awesomerafflegame.models.Game;
 import androidcourse.awesomerafflegame.sensors.BluetoothGameService;
 
 /**
@@ -357,7 +358,8 @@ public class GameSetUpFragment extends Fragment implements View.OnClickListener 
             setupGame();
         }
         if (v.getId() == btnVsComputer.getId()) {
-            sendMessage("Hejsa Mads");
+            FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_COMPUTER), "game_fragment");
+            //sendMessage("Hejsa Mads");
         }
     }
 }

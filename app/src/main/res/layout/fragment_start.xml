@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:background="#999A"
               android:orientation="vertical">
 
     <LinearLayout
@@ -38,25 +39,32 @@
             android:layout_marginRight="16dp"
             android:layout_marginTop="6dp"
             android:gravity="center_vertical|center_horizontal"
-            android:text="Large text"
+            android:text="Player name"
             android:textAppearance="?android:attr/textAppearanceLarge"/>
 
         <Button
             android:id="@+id/btnStartGame"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:background="@drawable/cool_button"
             android:text="Start Game"/>
 
         <Button
             android:id="@+id/btnResults"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Results"/>
+            android:layout_margin="8dp"
+            android:background="@drawable/cool_button"
+            android:text="Previous games"/>
 
         <Button
             android:id="@+id/btnAbout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:background="@drawable/cool_button"
+
             android:text="About"/>
     </LinearLayout>
 

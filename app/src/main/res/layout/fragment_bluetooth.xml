@@ -1,50 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/colorBackground"
+              android:orientation="vertical">
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Vs. Computer"
         android:id="@+id/btnVsComputer"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Vs Player"
-        android:id="@+id/btnVsPlayer"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/testTxtView"
-        android:layout_weight="1"
-        android:hint="Her kommer tekst fra anden enhed" />
-
-    <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="8dp"
+        android:background="@drawable/cool_button"
+        android:text="Play against computer"/>
+
+    <Button
+        android:id="@+id/btnVsPlayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="8dp"
+        android:background="@drawable/cool_button"
+        android:text="Play via Bluetooth"/>
+
+    <TextView
+        android:id="@+id/testTxtView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="Her kommer tekst fra anden enhed"/>
+
+    <LinearLayout
         android:id="@+id/blueLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:visibility="gone">
 
         <Button
+            android:id="@+id/btnListen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Listen for player"
-            android:id="@+id/btnListen"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:text="Listen for player"/>
 
         <Button
+            android:id="@+id/btnScan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Scan for player"
-            android:id="@+id/btnScan"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:text="Scan for player"/>
     </LinearLayout>
 </LinearLayout>

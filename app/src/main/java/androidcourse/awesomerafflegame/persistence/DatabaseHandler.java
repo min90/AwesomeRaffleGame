@@ -46,7 +46,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        // Handle alterations in database here
     }
 
     public void saveGame(Game game) {
