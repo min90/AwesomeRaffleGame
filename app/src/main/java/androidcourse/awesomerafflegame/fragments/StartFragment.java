@@ -62,7 +62,7 @@ public class StartFragment extends Fragment implements View.OnClickListener {
     }
 
     private void startGame() {
-        FragmentController.get().transactFragments(getActivity(), new GameSetUpFragment(), "game_fragment");
+        FragmentController.get().transactFragments(getActivity(), new TempFragment(), "game_fragment");
 //        FragmentController.get().transactFragments(getActivity(), new PreGameFragment(), "game_fragment");
     }
 
