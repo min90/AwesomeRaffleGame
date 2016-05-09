@@ -26,6 +26,7 @@ import java.util.Arrays;
 
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
+import androidcourse.awesomerafflegame.fragments.BluetoothHandler;
 import androidcourse.awesomerafflegame.fragments.StartFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -155,4 +156,22 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        BluetoothHandler.init(this);
+        BluetoothHandler.get().onStart();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        BluetoothHandler.get().onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        BluetoothHandler.get().onResume();
+    }
 }

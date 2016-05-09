@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,7 +32,7 @@ import androidcourse.awesomerafflegame.sensors.BluetoothGameService;
 /**
  * This fragment controls Bluetooth to communicate with other devices.
  */
-public class TempFragment extends Fragment implements View.OnClickListener {
+public class BluetoothHandler implements View.OnClickListener {
 
     private static final String TAG = "BluetoothChatFragment";
 
@@ -40,16 +41,9 @@ public class TempFragment extends Fragment implements View.OnClickListener {
     private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
     private static final int REQUEST_ENABLE_BT = 3;
 
-    private Button btnVsComputer;
-    private Button btnVsPlayer;
-    private Button btnSecure;
-    private Button btnInsecure;
-    private Button btnDisco;
-    private Button btnCancel;
-    private LinearLayout blueLayout;
-
-
     private OnMessageReceivedListener msgReceivedListener;
+
+    private Context context;
 
     /**
      * Name of the connected device
@@ -71,48 +65,50 @@ public class TempFragment extends Fragment implements View.OnClickListener {
      */
     private BluetoothGameService mGameService = null;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+    private static BluetoothHandler instance = null;
+
+    public static BluetoothHandler get() {
+        if (instance == null) {
+            throw new Error("BluetoothHandler not yet initialized");
+        }
+        return instance;
+    }
+
+    public static void init(Context context) {
+        instance = new BluetoothHandler(context);
+    }
+
+    private BluetoothHandler(Context context) {
+        this.context = context;
+
         // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // If the adapter is null, then Bluetooth is not supported
         if (mBluetoothAdapter == null) {
-//            FragmentActivity activity = getActivity();
-            Toast.makeText(getActivity(), "Bluetooth is not available", Toast.LENGTH_LONG).show();
-//            activity.finish();
+            Toast.makeText(context, "Bluetooth is not available", Toast.LENGTH_LONG).show();
         }
     }
 
-
-    @Override
     public void onStart() {
-        super.onStart();
         // If BT is not on, request that it be enabled.
         // setupGame() will then be called during onActivityResult
         if (!mBluetoothAdapter.isEnabled() && mBluetoothAdapter != null) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+            ((Activity) context).startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
             // Otherwise, setup the chat session
         } else if (mGameService == null) {
             setupGame();
         }
     }
 
-    @Override
     public void onDestroy() {
-        super.onDestroy();
         if (mGameService != null) {
             mGameService.stop();
         }
     }
 
-    @Override
     public void onResume() {
-        super.onResume();
-
         // Performing this check in onResume() covers the case in which BT was
         // not enabled during onStart(), so we were paused to enable it...
         // onResume() will be called when ACTION_REQUEST_ENABLE activity returns.
@@ -123,29 +119,6 @@ public class TempFragment extends Fragment implements View.OnClickListener {
                 mGameService.start();
             }
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_bluetooth, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        btnVsComputer = (Button) view.findViewById(R.id.btnVsComputer);
-        btnVsComputer.setOnClickListener(this);
-        btnVsPlayer = (Button) view.findViewById(R.id.btnVsPlayer);
-        btnVsPlayer.setOnClickListener(this);
-        btnSecure = (Button) view.findViewById(R.id.btn_connect_secure);
-        btnSecure.setOnClickListener(this);
-        btnInsecure = (Button) view.findViewById(R.id.btn_connect_insecure);
-        btnInsecure.setOnClickListener(this);
-        btnDisco = (Button) view.findViewById(R.id.btn_make_disco);
-        btnDisco.setOnClickListener(this);
-        blueLayout = (LinearLayout) view.findViewById(R.id.blueLayout);
-        btnCancel = (Button) view.findViewById(R.id.btn_cancel);
-        btnCancel.setOnClickListener(this);
     }
 
     public interface OnMessageReceivedListener {
@@ -159,11 +132,11 @@ public class TempFragment extends Fragment implements View.OnClickListener {
     /**
      * Set up the UI and background operations for chat.
      */
-    public void setupGame() {
+    private void setupGame() {
         Log.d(TAG, "setupGame()");
 
         // Initialize the BluetoothChatService to perform bluetooth connections
-        mGameService = new BluetoothGameService(getActivity(), mHandler);
+        mGameService = new BluetoothGameService(context, mHandler);
 
         // Initialize the buffer for outgoing messages
         mOutStringBuffer = new StringBuffer("");
@@ -172,12 +145,12 @@ public class TempFragment extends Fragment implements View.OnClickListener {
     /**
      * Makes this device discoverable.
      */
-    private void ensureDiscoverable() {
+    public void ensureDiscoverable() {
         if (mBluetoothAdapter.getScanMode() !=
                 BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
             discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-            startActivity(discoverableIntent);
+            context.startActivity(discoverableIntent);
         }
     }
 
@@ -217,65 +190,18 @@ public class TempFragment extends Fragment implements View.OnClickListener {
     };
 
     /**
-     * Updates the status on the action bar.
-     *
-     * @param resId a string resource ID
-     */
-    private void setStatus(int resId) {
-        FragmentActivity activity = getActivity();
-        if (null == activity) {
-            return;
-        }
-        final ActionBar actionBar = activity.getActionBar();
-        if (null == actionBar) {
-            return;
-        }
-        actionBar.setSubtitle(resId);
-    }
-
-    /**
-     * Updates the status on the action bar.
-     *
-     * @param subTitle status
-     */
-    private void setStatus(CharSequence subTitle) {
-        FragmentActivity activity = getActivity();
-        if (null == activity) {
-            return;
-        }
-        final ActionBar actionBar = activity.getActionBar();
-        if (null == actionBar) {
-            return;
-        }
-        actionBar.setSubtitle(subTitle);
-    }
-
-    /**
      * The Handler that gets information back from the BluetoothGameService
      */
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            FragmentActivity activity = getActivity();
+            FragmentActivity activity = (FragmentActivity) context;
             switch (msg.what) {
-                case Constants.MESSAGE_STATE_CHANGE:
-                    switch (msg.arg1) {
-                        case BluetoothGameService.STATE_CONNECTED:
-                            setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
-                            break;
-                        case BluetoothGameService.STATE_CONNECTING:
-                            setStatus(R.string.title_connecting);
-                            break;
-                        case BluetoothGameService.STATE_LISTEN:
-                        case BluetoothGameService.STATE_NONE:
-                            setStatus(R.string.title_not_connected);
-                            break;
-                    }
-                    break;
                 case Constants.MESSAGE_WRITE:
                     byte[] writeBuf = (byte[]) msg.obj;
                     // construct a string from the buffer
                     String writeMessage = new String(writeBuf);
+                    Log.d("MESSAGE_WRITE", writeMessage);
                     break;
                 case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
@@ -324,9 +250,9 @@ public class TempFragment extends Fragment implements View.OnClickListener {
                 } else {
                     // User did not enable Bluetooth or an error occurred
                     Log.d(TAG, "BT not enabled");
-                    Toast.makeText(getActivity(), R.string.bt_not_enabled_leaving,
+                    Toast.makeText(context, R.string.bt_not_enabled_leaving,
                             Toast.LENGTH_SHORT).show();
-                    getActivity().finish();
+                    ((Activity) context).finish();
                 }
         }
     }
@@ -349,59 +275,7 @@ public class TempFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == btnVsPlayer.getId()) {
-            FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_PLAYER), "game_fragment");
-            btnVsComputer.setEnabled(false);
-            blueLayout.setVisibility(View.VISIBLE);
-        }
-        if (v.getId() == btnVsComputer.getId()) {
-            blueLayout.setVisibility(View.GONE);
-            FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_COMPUTER), "game_fragment");
-        }
-        if (v.getId() == btnSecure.getId()) {
-            Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
-            startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
-        }
-        if (v.getId() == btnInsecure.getId()) {
-            Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
-            startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
-        }
-        if (v.getId() == btnDisco.getId()) {
-            ensureDiscoverable();
-        }
-        if (v.getId() == btnCancel.getId()) {
-            blueLayout.setVisibility(View.GONE);
-            btnVsComputer.setEnabled(true);
-        }
+        //
     }
-
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        inflater.inflate(R.menu.bluetooth_game, menu);
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case R.id.secure_connect_scan: {
-//                // Launch the DeviceListActivity to see devices and do scan
-//                Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
-//                startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
-//                return true;
-//            }
-//            case R.id.insecure_connect_scan: {
-//                // Launch the DeviceListActivity to see devices and do scan
-//                Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
-//                startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
-//                return true;
-//            }
-//            case R.id.discoverable: {
-//                // Ensure this device is discoverable by others
-//                ensureDiscoverable();
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
 
 }

@@ -9,7 +9,6 @@ import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +27,7 @@ import androidcourse.awesomerafflegame.sensors.ShakeSensor;
 /**
  * Created by Mads on 01/05/16.
  */
-public class GameFragment extends Fragment implements View.OnClickListener, ShakeSensor.OnShakeListener, TempFragment.OnMessageReceivedListener {
+public class GameFragment extends Fragment implements View.OnClickListener, ShakeSensor.OnShakeListener, BluetoothHandler.OnMessageReceivedListener {
 
     private final int PLAYER_ONE = 1;
     private final int PLAYER_TWO = 2;
@@ -44,7 +43,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     private static final String TAG_VERSUS = "versus";
 
     private ShakeSensor shakeSensor;
-    private TempFragment bluetoothFragment;
+    private BluetoothHandler bluetoothFragment;
 
     private AnimationDrawable dieOneAnimation, dieTwoAnimation;
 
@@ -80,9 +79,8 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         this.shakeSensor = new ShakeSensor(getActivity());
         this.shakeSensor.setOnShakeListener(this);
 
-        this.bluetoothFragment = new TempFragment();
+        this.bluetoothFragment = BluetoothHandler.get();
         this.bluetoothFragment.setOnMessageReceivedListener(this);
-        this.bluetoothFragment.setupGame();
 
         currentPlayer = PLAYER_ONE;
         // Perhaps get players real name
