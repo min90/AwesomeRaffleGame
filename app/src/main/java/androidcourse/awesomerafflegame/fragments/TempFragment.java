@@ -45,10 +45,12 @@ public class TempFragment extends Fragment implements View.OnClickListener {
 
     private Button btnVsComputer;
     private Button btnVsPlayer;
-    private Button btnListen;
-    private Button btnScan;
+    private Button btnSecure;
+    private Button btnInsecure;
+    private Button btnDisco;
+    private Button btnCancel;
     private LinearLayout blueLayout;
-    private TextView txtTest;
+
 
     /**
      * Name of the connected device
@@ -79,9 +81,9 @@ public class TempFragment extends Fragment implements View.OnClickListener {
 
         // If the adapter is null, then Bluetooth is not supported
         if (mBluetoothAdapter == null) {
-            FragmentActivity activity = getActivity();
-            Toast.makeText(activity, "Bluetooth is not available", Toast.LENGTH_LONG).show();
-            activity.finish();
+//            FragmentActivity activity = getActivity();
+            Toast.makeText(getActivity(), "Bluetooth is not available", Toast.LENGTH_LONG).show();
+//            activity.finish();
         }
     }
 
@@ -91,7 +93,7 @@ public class TempFragment extends Fragment implements View.OnClickListener {
         super.onStart();
         // If BT is not on, request that it be enabled.
         // setupGame() will then be called during onActivityResult
-        if (!mBluetoothAdapter.isEnabled()) {
+        if (!mBluetoothAdapter.isEnabled() && mBluetoothAdapter != null) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
             // Otherwise, setup the chat session
@@ -136,12 +138,15 @@ public class TempFragment extends Fragment implements View.OnClickListener {
         btnVsComputer.setOnClickListener(this);
         btnVsPlayer = (Button) view.findViewById(R.id.btnVsPlayer);
         btnVsPlayer.setOnClickListener(this);
-        btnListen = (Button) view.findViewById(R.id.btnListen);
-        btnListen.setOnClickListener(this);
-        btnScan = (Button) view.findViewById(R.id.btnScan);
-        btnScan.setOnClickListener(this);
+        btnSecure = (Button) view.findViewById(R.id.btn_connect_secure);
+        btnSecure.setOnClickListener(this);
+        btnInsecure = (Button) view.findViewById(R.id.btn_connect_insecure);
+        btnInsecure.setOnClickListener(this);
+        btnDisco = (Button) view.findViewById(R.id.btn_make_disco);
+        btnDisco.setOnClickListener(this);
         blueLayout = (LinearLayout) view.findViewById(R.id.blueLayout);
-        txtTest = (TextView) view.findViewById(R.id.testTxtView);
+        btnCancel = (Button) view.findViewById(R.id.btn_cancel);
+        btnCancel.setOnClickListener(this);
     }
 
     /**
@@ -269,7 +274,6 @@ public class TempFragment extends Fragment implements View.OnClickListener {
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    txtTest.setText(readMessage);
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name
@@ -337,40 +341,57 @@ public class TempFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v.getId() == btnVsPlayer.getId()) {
-            sendMessage("Hejsa Mads");
+            btnVsComputer.setEnabled(false);
+            blueLayout.setVisibility(View.VISIBLE);
         }
         if (v.getId() == btnVsComputer.getId()) {
+            blueLayout.setVisibility(View.GONE);
             FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_COMPUTER), "game_fragment");
         }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.bluetooth_game, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.secure_connect_scan: {
-                // Launch the DeviceListActivity to see devices and do scan
-                Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
-                startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
-                return true;
-            }
-            case R.id.insecure_connect_scan: {
-                // Launch the DeviceListActivity to see devices and do scan
-                Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
-                startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
-                return true;
-            }
-            case R.id.discoverable: {
-                // Ensure this device is discoverable by others
-                ensureDiscoverable();
-                return true;
-            }
+        if(v.getId() == btnSecure.getId()){
+            Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
+            startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
         }
-        return false;
+        if(v.getId() == btnInsecure.getId()){
+            Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
+            startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+        }
+        if(v.getId() == btnDisco.getId()){
+            ensureDiscoverable();
+        }
+        if(v.getId() == btnCancel.getId()){
+            blueLayout.setVisibility(View.GONE);
+            btnVsComputer.setEnabled(true);
+        }
     }
+
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        inflater.inflate(R.menu.bluetooth_game, menu);
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.secure_connect_scan: {
+//                // Launch the DeviceListActivity to see devices and do scan
+//                Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
+//                startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+//                return true;
+//            }
+//            case R.id.insecure_connect_scan: {
+//                // Launch the DeviceListActivity to see devices and do scan
+//                Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
+//                startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+//                return true;
+//            }
+//            case R.id.discoverable: {
+//                // Ensure this device is discoverable by others
+//                ensureDiscoverable();
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
 }
