@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,11 +25,11 @@ import androidcourse.awesomerafflegame.adapters.Constants;
  */
 public class BluetoothGameService {
     // Debugging
-    private static final String TAG = "BluetoothChatService";
+    private static final String TAG = "BluetoothGameService";
 
     // Name for the SDP record when creating server socket
-    private static final String NAME_SECURE = "BluetoothChatSecure";
-    private static final String NAME_INSECURE = "BluetoothChatInsecure";
+    private static final String NAME_SECURE = "BluetoothGameSecure";
+    private static final String NAME_INSECURE = "BluetoothGameInsecure";
 
     // Unique UUID for this application
     private static final UUID MY_UUID_SECURE =

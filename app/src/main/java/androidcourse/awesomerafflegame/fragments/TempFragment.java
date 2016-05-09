@@ -50,6 +50,8 @@ public class TempFragment extends Fragment implements View.OnClickListener {
     private LinearLayout blueLayout;
     private TextView txtTest;
 
+    private OnMessageReceivedListener msgReceivedListener;
+
     /**
      * Name of the connected device
      */
@@ -144,6 +146,14 @@ public class TempFragment extends Fragment implements View.OnClickListener {
         txtTest = (TextView) view.findViewById(R.id.testTxtView);
     }
 
+    public interface OnMessageReceivedListener {
+        void onMessageReceived();
+    }
+
+    public void setOnMessageReceivedListener(OnMessageReceivedListener listener) {
+        this.msgReceivedListener = listener;
+    }
+
     /**
      * Set up the UI and background operations for chat.
      */
@@ -174,7 +184,7 @@ public class TempFragment extends Fragment implements View.OnClickListener {
      *
      * @param message A string of text to send.
      */
-    private void sendMessage(String message) {
+    public void sendMessage(String message) {
         // Check that we're actually connected before trying anything
         if (mGameService.getState() != BluetoothGameService.STATE_CONNECTED) {
             Toast.makeText(getActivity(), R.string.not_connected, Toast.LENGTH_SHORT).show();
@@ -239,7 +249,7 @@ public class TempFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * The Handler that gets information back from the BluetoothChatService
+     * The Handler that gets information back from the BluetoothGameService
      */
     private final Handler mHandler = new Handler() {
         @Override
@@ -268,6 +278,7 @@ public class TempFragment extends Fragment implements View.OnClickListener {
                 case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
+                    msgReceivedListener.onMessageReceived();
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     txtTest.setText(readMessage);
                     break;
@@ -337,7 +348,7 @@ public class TempFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v.getId() == btnVsPlayer.getId()) {
-            sendMessage("Hejsa Mads");
+            FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_PLAYER), "game_fragment");
         }
         if (v.getId() == btnVsComputer.getId()) {
             FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_COMPUTER), "game_fragment");

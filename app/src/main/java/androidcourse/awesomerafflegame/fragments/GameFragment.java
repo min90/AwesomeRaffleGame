@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Random;
 
@@ -27,7 +28,7 @@ import androidcourse.awesomerafflegame.sensors.ShakeSensor;
 /**
  * Created by Mads on 01/05/16.
  */
-public class GameFragment extends Fragment implements View.OnClickListener, ShakeSensor.OnShakeListener {
+public class GameFragment extends Fragment implements View.OnClickListener, ShakeSensor.OnShakeListener, TempFragment.OnMessageReceivedListener {
 
     private final int PLAYER_ONE = 1;
     private final int PLAYER_TWO = 2;
@@ -43,6 +44,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     private static final String TAG_VERSUS = "versus";
 
     private ShakeSensor shakeSensor;
+    private TempFragment bluetoothFragment;
 
     private AnimationDrawable dieOneAnimation, dieTwoAnimation;
 
@@ -77,6 +79,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
 
         this.shakeSensor = new ShakeSensor(getActivity());
         this.shakeSensor.setOnShakeListener(this);
+
+        this.bluetoothFragment = new TempFragment();
+        this.bluetoothFragment.setOnMessageReceivedListener(this);
 
         currentPlayer = PLAYER_ONE;
         // Perhaps get players real name
@@ -171,6 +176,8 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         // Correct zero-indexed faces
         int actualFaceOne = faceOne + 1;
         int actualFaceTwo = faceTwo + 1;
+
+        bluetoothFragment.sendMessage("Tis");
 
         if (currentPlayer == PLAYER_ONE) {
             updatePlayerOneScore(actualFaceOne, actualFaceTwo);
@@ -359,6 +366,11 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         resetDice();
         vibrateDevice(1000);
         rollDice(1000);
+    }
+
+    @Override
+    public void onMessageReceived() {
+        Toast.makeText(getActivity(), "Vi fik en besked", Toast.LENGTH_SHORT).show();
     }
 
     @Override
