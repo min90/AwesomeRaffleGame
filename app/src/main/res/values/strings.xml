@@ -6,23 +6,27 @@
     <string name="facebook_app_id">1713543598925716</string>
     <string name="welcome_message">Welcome to the awesome raffle game</string>
 
-    <!-- Bluetooth info -->
-    <string name="string_paired_devices">Paired devices</string>
-    <string name="string_available_devices">Available devices</string>
-    <string name="string_scan_devices">Scan for devices</string>
+    <!--  BluetoothChat -->
+    <string name="send">Send</string>
+    <string name="not_connected">You are not connected to a device</string>
+    <string name="bt_not_enabled_leaving">Bluetooth was not enabled. Leaving Bluetooth Chat.</string>
+    <string name="title_connecting">connecting...</string>
+    <string name="title_connected_to">connected to <xliff:g id="device_name">%1$s</xliff:g></string>
+    <string name="title_not_connected">not connected</string>
 
-    <string name="string_connect_secure">Connect secure</string>
-    <string name="string_connect_insecure">Connect insecure</string>
-    <string name="string_make_discoverable">Make discoverable</string>
-    <string name="select_device">Select a device to connect</string>
+    <!--  DeviceListActivity -->
+    <string name="scanning">scanning for devices...</string>
+    <string name="select_device">select a device to connect</string>
     <string name="none_paired">No devices have been paired</string>
     <string name="none_found">No devices found</string>
-    <string name="scanning">Scanning for devices...</string>
+    <string name="title_paired_devices">Paired Devices</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">Scan for devices</string>
 
-    <string name="title_connected_to">Connected to <xliff:g id="device_name">%1$s</xliff:g></string>
-    <string name="title_not_connected">Not connected</string>
-    <string name="title_connecting">Connecting...</string>
-    <string name="not_connected">You are not connected to a device</string>
+    <!-- Options Menu -->
+    <string name="secure_connect">Connect a device - Secure</string>
+    <string name="insecure_connect">Connect a device - Insecure</string>
+    <string name="discoverable">Make discoverable</string>
 
 
 
