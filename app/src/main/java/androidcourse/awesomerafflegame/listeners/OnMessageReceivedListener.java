@@ -1,4 +1,4 @@
-package androidcourse.awesomerafflegame;
+package androidcourse.awesomerafflegame.listeners;
 
 /**
  * Created by Mads on 10/05/2016.

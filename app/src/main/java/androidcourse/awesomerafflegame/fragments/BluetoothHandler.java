@@ -11,7 +11,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidcourse.awesomerafflegame.OnMessageReceivedListener;
+import androidcourse.awesomerafflegame.listeners.OnMessageReceivedListener;
 import androidcourse.awesomerafflegame.listeners.ConnectionListener;
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.activities.DeviceListActivity;

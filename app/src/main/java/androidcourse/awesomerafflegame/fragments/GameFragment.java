@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,7 @@ import android.widget.Toast;
 
 import java.util.Random;
 
-import androidcourse.awesomerafflegame.OnMessageReceivedListener;
+import androidcourse.awesomerafflegame.listeners.OnMessageReceivedListener;
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.models.Game;
 import androidcourse.awesomerafflegame.persistence.DatabaseHandler;
