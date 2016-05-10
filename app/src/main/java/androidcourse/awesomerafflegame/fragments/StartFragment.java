@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
+import androidcourse.awesomerafflegame.controllers.SharedPreferencesManager;
 
 /**
  * Created by Jesper on 04/04/16.
@@ -25,7 +26,7 @@ public class StartFragment extends Fragment implements View.OnClickListener {
 
     private String name;
 
-    private TextView txtWelcomeMessage;
+    private TextView txtWelcomeMessage, versionTxt;
 
     public static StartFragment newInstance(String name) {
         StartFragment fragment = new StartFragment();
@@ -50,6 +51,7 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         btnResults.setOnClickListener(this);
         btnAbout = (Button) view.findViewById(R.id.btnAbout);
         btnAbout.setOnClickListener(this);
+        versionTxt = (TextView) view.findViewById(R.id.versionTxt);
 
         txtWelcomeMessage = (TextView) view.findViewById(R.id.txtPlayername);
         if (name != null) {
@@ -61,9 +63,15 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
+    private void showInfoDialog(){
+        if(SharedPreferencesManager.get().getFirstTimeUser()){
+            FragmentController.get().transactDialogFragment(getActivity(), new FirstTimeUsersFragment(), "info_fragment");
+            SharedPreferencesManager.get().setFirstTimeUser(false);
+        }
+    }
+
     private void startGame() {
         FragmentController.get().transactFragments(getActivity(), new PreGameFragment(), "game_fragment");
-//        FragmentController.get().transactFragments(getActivity(), new PreGameFragment(), "game_fragment");
     }
 
     private void about() {

@@ -25,7 +25,7 @@ import androidcourse.awesomerafflegame.adapters.Constants;
  */
 public class BluetoothGameService {
     // Debugging
-    private static final String TAG = "BluetoothGameService";
+    private static final String TAG = BluetoothGameService.class.getSimpleName();
 
     // Name for the SDP record when creating server socket
     private static final String NAME_SECURE = "BluetoothGameSecure";
@@ -53,7 +53,7 @@ public class BluetoothGameService {
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
 
     /**
-     * Constructor. Prepares a new BluetoothChat session.
+     * Constructor. Prepares a new Bluetoothgame session.
      *
      * @param context The UI Activity Context
      * @param handler A Handler to send messages back to the UI Activity
@@ -85,7 +85,7 @@ public class BluetoothGameService {
     }
 
     /**
-     * Start the chat service. Specifically start AcceptThread to begin a
+     * Start the game service. Specifically start AcceptThread to begin a
      * session in listening (server) mode. Called by the Activity onResume()
      */
     public synchronized void start() {
@@ -297,8 +297,7 @@ public class BluetoothGameService {
         }
 
         public void run() {
-            Log.d(TAG, "Socket Type: " + mSocketType +
-                    "BEGIN mAcceptThread" + this);
+            Log.d(TAG, "Socket Type: " + mSocketType + " BEGIN mAcceptThread" + this);
             setName("AcceptThread" + mSocketType);
 
             BluetoothSocket socket = null;
@@ -321,8 +320,7 @@ public class BluetoothGameService {
                             case STATE_LISTEN:
                             case STATE_CONNECTING:
                                 // Situation normal. Start the connected thread.
-                                connected(socket, socket.getRemoteDevice(),
-                                        mSocketType);
+                                connected(socket, socket.getRemoteDevice(), mSocketType);
                                 break;
                             case STATE_NONE:
                             case STATE_CONNECTED:
@@ -400,8 +398,7 @@ public class BluetoothGameService {
                 try {
                     mmSocket.close();
                 } catch (IOException e2) {
-                    Log.e(TAG, "unable to close() " + mSocketType +
-                            " socket during connection failure", e2);
+                    Log.e(TAG, "unable to close() " + mSocketType + " socket during connection failure", e2);
                 }
                 connectionFailed();
                 return;
@@ -464,8 +461,7 @@ public class BluetoothGameService {
                     bytes = mmInStream.read(buffer);
 
                     // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
-                            .sendToTarget();
+                    mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
@@ -486,8 +482,7 @@ public class BluetoothGameService {
                 mmOutStream.write(buffer);
 
                 // Share the sent message back to the UI Activity
-                mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer)
-                        .sendToTarget();
+                mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer).sendToTarget();
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
             }
