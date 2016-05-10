@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import androidcourse.awesomerafflegame.ConnectionListener;
+import androidcourse.awesomerafflegame.listeners.ConnectionListener;
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.activities.DeviceListActivity;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
