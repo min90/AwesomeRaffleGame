@@ -1,6 +1,7 @@
 package androidcourse.awesomerafflegame.controllers;
 
 import android.app.Activity;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -36,6 +37,21 @@ public class FragmentController {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
         if (fragmentManager.getBackStackEntryCount() != 0) {
             fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
+    }
+
+    public void transactDialogFragment(FragmentActivity fragmentActivity, DialogFragment fragment, String backStackTag){
+        WeakReference<FragmentActivity> wrActivity = new WeakReference<>(fragmentActivity);
+        final Activity activity = wrActivity.get();
+        if(activity != null && !activity.isFinishing()) {
+            if (fragment != null) {
+                FragmentManager fragmentManager = fragmentActivity.getSupportFragmentManager();
+                if(backStackTag != null) {
+                    fragment.show(fragmentManager, backStackTag);
+                } else {
+                    fragment.show(fragmentManager, "");
+                }
+            }
         }
     }
 

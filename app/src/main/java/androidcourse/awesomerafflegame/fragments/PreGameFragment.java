@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import androidcourse.awesomerafflegame.ConnectionListener;
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.activities.DeviceListActivity;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
@@ -17,7 +18,7 @@ import androidcourse.awesomerafflegame.controllers.FragmentController;
 /**
  * Created by Mads on 09/05/2016.
  */
-public class PreGameFragment extends Fragment implements View.OnClickListener {
+public class PreGameFragment extends Fragment implements View.OnClickListener, ConnectionListener {
 
     private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
     private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
@@ -56,7 +57,7 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v.getId() == btnVsPlayer.getId()) {
-            FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_PLAYER), "game_fragment");
+            BluetoothHandler.get().setConnectionListener(this);
             btnVsComputer.setEnabled(false);
             blueLayout.setVisibility(View.VISIBLE);
         }
@@ -84,5 +85,10 @@ public class PreGameFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         BluetoothHandler.get().onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void setUpPlayerVsPlayer() {
+        FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_PLAYER), "game_fragment");
     }
 }
