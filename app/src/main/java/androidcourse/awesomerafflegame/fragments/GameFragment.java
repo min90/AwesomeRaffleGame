@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import java.util.Random;
 
+import androidcourse.awesomerafflegame.OnMessageReceivedListener;
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.models.Game;
 import androidcourse.awesomerafflegame.persistence.DatabaseHandler;
@@ -27,7 +28,7 @@ import androidcourse.awesomerafflegame.sensors.ShakeSensor;
 /**
  * Created by Mads on 01/05/16.
  */
-public class GameFragment extends Fragment implements View.OnClickListener, ShakeSensor.OnShakeListener, BluetoothHandler.OnMessageReceivedListener {
+public class GameFragment extends Fragment implements View.OnClickListener, ShakeSensor.OnShakeListener, OnMessageReceivedListener {
 
     private final int PLAYER_ONE = 1;
     private final int PLAYER_TWO = 2;

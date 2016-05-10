@@ -12,6 +12,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidcourse.awesomerafflegame.ConnectionListener;
+import androidcourse.awesomerafflegame.OnMessageReceivedListener;
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.activities.DeviceListActivity;
 import androidcourse.awesomerafflegame.adapters.Constants;
@@ -103,10 +104,6 @@ public class BluetoothHandler {
                 mGameService.start();
             }
         }
-    }
-
-    public interface OnMessageReceivedListener {
-        void onMessageReceived(String message);
     }
 
     public void setOnMessageReceivedListener(OnMessageReceivedListener listener) {
