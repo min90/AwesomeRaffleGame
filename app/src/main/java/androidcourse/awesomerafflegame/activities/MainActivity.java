@@ -1,6 +1,8 @@
 package androidcourse.awesomerafflegame.activities;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,7 @@ import java.util.Arrays;
 
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
+import androidcourse.awesomerafflegame.controllers.SharedPreferencesManager;
 import androidcourse.awesomerafflegame.fragments.BluetoothHandler;
 import androidcourse.awesomerafflegame.fragments.StartFragment;
 
@@ -46,14 +49,26 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         callbackManager = CallbackManager.Factory.create();
         loginButton = (LoginButton) findViewById(R.id.login_button);
+        SharedPreferencesManager.init(this);
         //checkAccessToken();
         //createLogin();
+
 
         setUpToolbar();
 
         container = (FrameLayout) findViewById(R.id.fragment_container);
         container.setVisibility(View.VISIBLE);
         FragmentController.get().transactFragments(this, StartFragment.newInstance("Mogens"), "start_fragment");
+    }
+
+    private void getVersionName(){
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            String version = pInfo.versionName;
+            SharedPreferencesManager.get().setVersionName(version);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(DEBUG_TAG, "Not able to determine version", e);
+        }
     }
 
     @Override

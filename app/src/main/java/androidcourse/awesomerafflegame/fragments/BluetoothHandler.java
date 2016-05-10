@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidcourse.awesomerafflegame.listeners.ConnectionListener;
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.activities.DeviceListActivity;
 import androidcourse.awesomerafflegame.adapters.Constants;
@@ -21,7 +22,7 @@ import androidcourse.awesomerafflegame.sensors.BluetoothGameService;
  */
 public class BluetoothHandler {
 
-    private static final String TAG = "BluetoothChatFragment";
+    private static final String TAG = BluetoothHandler.class.getSimpleName();
 
     // Intent request codes
     private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
@@ -29,6 +30,7 @@ public class BluetoothHandler {
     private static final int REQUEST_ENABLE_BT = 3;
 
     private OnMessageReceivedListener msgReceivedListener;
+    private ConnectionListener connectionListener;
 
     private Context context;
 
@@ -111,8 +113,12 @@ public class BluetoothHandler {
         this.msgReceivedListener = listener;
     }
 
+    public void setConnectionListener(ConnectionListener listener){
+        this.connectionListener = listener;
+    }
+
     /**
-     * Set up the UI and background operations for chat.
+     * Set up the UI and background operations for game.
      */
     private void setupGame() {
         Log.d(TAG, "setupGame()");
@@ -136,13 +142,13 @@ public class BluetoothHandler {
     public void sendMessage(String message) {
         // Check that we're actually connected before trying anything
         if (mGameService.getState() != BluetoothGameService.STATE_CONNECTED) {
-            //Toast.makeText(getActivity(), R.string.not_connected, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.not_connected, Toast.LENGTH_SHORT).show();
             return;
         }
 
         // Check that there's actually something to send
         if (message.length() > 0) {
-            // Get the message bytes and tell the BluetoothChatService to write
+            // Get the message bytes and tell the BluetoothGameService to write
             byte[] send = message.getBytes();
             mGameService.write(send);
         }
@@ -168,8 +174,8 @@ public class BluetoothHandler {
                     // save the connected device's name
                     mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
                     if (null != activity) {
-                        Toast.makeText(activity, "Connected to "
-                                + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+                        connectionListener.setUpPlayerVsPlayer();
+                        Toast.makeText(activity, "Connected to " + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
                     }
                     break;
                 case Constants.MESSAGE_TOAST:
@@ -204,15 +210,14 @@ public class BluetoothHandler {
                 } else {
                     // User did not enable Bluetooth or an error occurred
                     Log.d(TAG, "BT not enabled");
-                    Toast.makeText(context, R.string.bt_not_enabled_leaving,
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.bt_not_enabled_leaving, Toast.LENGTH_SHORT).show();
                     ((Activity) context).finish();
                 }
         }
     }
 
     /**
-     * Establish connection with other divice
+     * Establish connection with other device
      *
      * @param data   An {@link Intent} with {@link DeviceListActivity#EXTRA_DEVICE_ADDRESS} extra.
      * @param secure Socket Security type - Secure (true) , Insecure (false)
