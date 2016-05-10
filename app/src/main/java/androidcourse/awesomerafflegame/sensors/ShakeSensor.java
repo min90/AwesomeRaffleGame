@@ -48,6 +48,10 @@ public class ShakeSensor implements SensorEventListener {
         isEnabled = true;
     }
 
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
     public interface OnShakeListener {
         void onShake(int count);
     }
