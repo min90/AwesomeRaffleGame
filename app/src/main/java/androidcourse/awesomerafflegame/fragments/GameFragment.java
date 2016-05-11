@@ -21,10 +21,11 @@ import android.widget.Toast;
 
 import java.util.Random;
 
+import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.bluetooth.BluetoothHandler;
 import androidcourse.awesomerafflegame.bluetooth.listeners.OnBluetoothMessageReceivedListener;
-import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
+import androidcourse.awesomerafflegame.controllers.SharedPreferencesManager;
 import androidcourse.awesomerafflegame.domain.Game;
 import androidcourse.awesomerafflegame.persistence.DatabaseHandler;
 import androidcourse.awesomerafflegame.sensors.OnShakeListener;
@@ -58,6 +59,8 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
 
     private AnimationDrawable dieOneAnimation, dieTwoAnimation;
 
+    private TextView tvOpponentName;
+
     private TextView tvCurrentPlayer;
     private TextView tvPlayerOneScore;
     private TextView tvOpponentScore;
@@ -69,6 +72,8 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
     private AlertDialog endOfGameDialog;
 
     private int currentPlayer;
+    private String playerName;
+    private String opponentName;
     private String currentPlayerName;
 
     private boolean vsPlayer;
@@ -100,8 +105,8 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
 
         currentPlayer = PLAYER_ONE;
 
-        // Perhaps get players real name
-        currentPlayerName = "Player 1";
+        playerName = SharedPreferencesManager.get().getPlayerName();
+        currentPlayerName = playerName;
 
         playerOneTotalScore = 0;
         roundScore = 0;
@@ -124,11 +129,15 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
     }
 
     private void initTextViews(View view) {
+        TextView tvPlayerName = (TextView) view.findViewById(R.id.tv_player_name);
+        tvPlayerName.setText(playerName);
+
         String opponentName = vsPlayer ? "Player 2" : "Computer";
-        TextView tvOpponentName = (TextView) view.findViewById(R.id.tv_opponent_name);
+        tvOpponentName = (TextView) view.findViewById(R.id.tv_opponent_name);
         tvOpponentName.setText(opponentName);
 
         tvCurrentPlayer = (TextView) view.findViewById(R.id.tv_current_player);
+        tvCurrentPlayer.setText(playerName + " has the dice");
 
         tvPlayerOneScore = (TextView) view.findViewById(R.id.tv_player_one_total_score);
         tvOpponentScore = (TextView) view.findViewById(R.id.tv_opponent_total_score);
@@ -153,7 +162,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
     private void chooseWhoStarts() {
         int face = new Random().nextInt(6) + 1;
         initialRoll = face;
-        bluetoothHandler.sendMessage(TAG_WHO_STARTS + "," + face);
+        bluetoothHandler.sendMessage(TAG_WHO_STARTS + "," + playerName + "," + face);
     }
 
     private void resetDice() {
@@ -227,7 +236,8 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
                 bluetoothHandler.sendMessage(TAG_SWAP + "," + LOST_ALL_POINTS);
             }
 
-            handOverDice(LOST_ALL_POINTS, "They");
+            currentPlayerName = opponentName;
+            handOverDice(LOST_ALL_POINTS);
         } else if (faceOne == 1 ^ faceTwo == 1) {
             if (!(roundScore < 0)) {
                 playerOneTotalScore -= roundScore;
@@ -239,7 +249,8 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
                 bluetoothHandler.sendMessage(TAG_SWAP + "," + LOST_POINTS_FOR_ROUND + "," + roundScore);
             }
 
-            handOverDice(LOST_POINTS_FOR_ROUND, "They");
+            currentPlayerName = opponentName;
+            handOverDice(LOST_POINTS_FOR_ROUND);
         } else {
             roundScore += (faceOne + faceTwo);
             playerOneTotalScore += (faceOne + faceTwo);
@@ -263,12 +274,16 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
     private void updateOpponentScore(int faceOne, int faceTwo) {
         if (faceOne == 1 && faceTwo == 1) {
             opponentTotalScore = 0;
-            handOverDice(LOST_ALL_POINTS, "You");
+
+            currentPlayerName = playerName;
+            handOverDice(LOST_ALL_POINTS);
         } else if (faceOne == 1 ^ faceTwo == 1) {
             if (!(roundScore < 0)) {
                 opponentTotalScore -= roundScore;
             }
-            handOverDice(LOST_POINTS_FOR_ROUND, "You");
+
+            currentPlayerName = playerName;
+            handOverDice(LOST_POINTS_FOR_ROUND);
         } else {
             roundScore += (faceOne + faceTwo);
             opponentTotalScore += (faceOne + faceTwo);
@@ -276,7 +291,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
                 opponentTotalScore = 100;
 
                 if (getArguments().getInt(TAG_VERSUS) == VS_PLAYER) {
-                    tvAnnouncement.setText("They won!");
+                    tvAnnouncement.setText(opponentName + " won!");
                     endGame(PLAYER_TWO);
                 } else {
                     tvAnnouncement.setText("Computer won!");
@@ -293,7 +308,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
         tvOpponentScore.setText(Integer.toString(opponentTotalScore));
     }
 
-    private void handOverDice(int announcement, String playerName) {
+    private void handOverDice(int announcement) {
         roundScore = 0;
         tvRoundScore.setText("0");
 
@@ -311,15 +326,13 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
                 currentPlayerName = "Computer";
             } else {
                 currentPlayer = PLAYER_ONE;
-                currentPlayerName = "Player 1";
+                currentPlayerName = playerName;
                 // Release sensor and buttons to user after computer turn ends
                 toggleControls(true);
             }
-            tvCurrentPlayer.setText(String.format("%s has the dice", currentPlayerName));
-        } else if (vsPlayer) {
-            tvCurrentPlayer.setText(String.format("%s have the dice", playerName));
         }
 
+        tvCurrentPlayer.setText(String.format("%s has the dice", currentPlayerName));
 
         if (currentPlayer == COMPUTER) {
             doComputerTurn();
@@ -348,7 +361,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
             @Override
             public void run() {
                 if (roundScore > 20) {
-                    handOverDice(SWAP_TURNS, "You");
+
+                    currentPlayerName = playerName;
+                    handOverDice(SWAP_TURNS);
                 } else {
                     shakeSensor.doShake();
                 }
@@ -361,7 +376,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
 
         switch (getArguments().getInt(TAG_VERSUS)) {
             case VS_PLAYER:
-                game.setOpponent("Player 2");
+                game.setOpponent(opponentName);
                 break;
             case VS_COMPUTER:
                 game.setOpponent("Computer");
@@ -370,10 +385,10 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
 
         switch (winner) {
             case PLAYER_ONE:
-                game.setWinner("Player 1");
+                game.setWinner(playerName);
                 break;
             case PLAYER_TWO:
-                game.setWinner("Player 2");
+                game.setWinner(opponentName);
                 break;
             case COMPUTER:
                 game.setWinner("Computer");
@@ -424,7 +439,8 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
         tvRoundScore.setText(roundScore);
 
         if (currentPlayer == COMPUTER) {
-            handOverDice(SWAP_TURNS, "You");
+            currentPlayerName = playerName;
+            handOverDice(SWAP_TURNS);
         }
     }
 
@@ -432,7 +448,8 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
     public void onClick(View v) {
         if (v.getId() == bHandOverDice.getId()) {
             toggleControls(false);
-            handOverDice(SWAP_TURNS, "They");
+            currentPlayerName = opponentName;
+            handOverDice(SWAP_TURNS);
             if (vsPlayer) {
                 bluetoothHandler.sendMessage(TAG_SWAP + "," + "HAND_OVER");
             }
@@ -449,15 +466,19 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
     @Override
     public void onMessageReceived(String message) {
         if (message.split(",")[0].equals(TAG_WHO_STARTS)) {
-            if (Integer.parseInt(message.split(",")[1]) > initialRoll) {
+            opponentName = message.split(",")[1];
+            // Update opponent TextView while we have the name
+            tvOpponentName.setText(opponentName);
+
+            if (Integer.parseInt(message.split(",")[2]) > initialRoll) {
 
                 //Their initial roll was bigger, hand over the dice to them
-                Toast.makeText(getActivity(), "They start!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), opponentName + " starts!", Toast.LENGTH_SHORT).show();
                 bHandOverDice.performClick();
             } else {
 
                 // Your initial roll was bigger, keep the dice
-                Toast.makeText(getActivity(), "You start!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), playerName + " starts!", Toast.LENGTH_SHORT).show();
             }
         } else if (message.split(",")[0].equals(TAG_SCORE) && message.split(",").length > 1) {
 
@@ -473,7 +494,8 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
             }
             tvOpponentScore.setText(String.valueOf(opponentTotalScore));
             toggleControls(true);
-            handOverDice(SWAP_TURNS, "You");
+            currentPlayerName = playerName;
+            handOverDice(SWAP_TURNS);
         } else if (message.equals(TAG_RESET)) {
             resetGame();
             chooseWhoStarts();
@@ -503,14 +525,14 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.rules_menu){
+        if (id == R.id.rules_menu) {
             showRulesDialog();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void showRulesDialog(){
+    private void showRulesDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Rules");
         builder.setMessage(R.string.rules);
