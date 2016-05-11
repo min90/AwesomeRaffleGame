@@ -54,8 +54,8 @@ public class GameRCVAdapter extends RecyclerView.Adapter<GameRCVAdapter.ViewHold
         Game game = games.get(position);
 
         holder.tvIndex.setText(Integer.toString(position + 1));
-        holder.tvVersus.setText(String.format("Player 1 vs %s", game.getOpponent()));
-        if (game.getWinner().equals("Player 1")) {
+        holder.tvVersus.setText(String.format(SharedPreferencesManager.get().getPlayerName() + " vs %s", game.getOpponent()));
+        if (game.getWinner().equals(SharedPreferencesManager.get().getPlayerName())) {
             holder.tvOutcome.setText("WIN");
         } else {
             holder.tvOutcome.setText("LOSS");
