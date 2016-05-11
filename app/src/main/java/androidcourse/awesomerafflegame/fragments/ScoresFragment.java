@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,17 +26,9 @@ import androidcourse.awesomerafflegame.persistence.DatabaseHandler;
  */
 public class ScoresFragment extends Fragment {
     public static final String DEBUG_TAG = ScoresFragment.class.getSimpleName();
-    public static final String RESULT_TAG = "results";
 
-    public static ScoresFragment newInstance(String name) {
-        ScoresFragment fragment = new ScoresFragment();
-        Bundle args = new Bundle();
+    private RecyclerView gamesRCV;
 
-        args.putString(RESULT_TAG, name);
-
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Nullable
     @Override
@@ -43,16 +36,24 @@ public class ScoresFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_scores, container, false);
 
         List<Game> games = new DatabaseHandler(getActivity()).getAllGames();
+        gamesRCV = (RecyclerView) view.findViewById(R.id.games_rcv);
+        TextView txtNoPrevious = (TextView) view.findViewById(R.id.txt_no_previous);
 
         //reverse the list to show newest games first
         Collections.reverse(games);
 
-        setUpRecyclerView(games, view);
+        if(games.isEmpty()){
+            if(gamesRCV.getVisibility() == View.VISIBLE){
+                gamesRCV.setVisibility(View.GONE);
+            }
+            txtNoPrevious.setVisibility(View.VISIBLE);
+        }
+
+        setUpRecyclerView(games);
         return view;
     }
 
-    private void setUpRecyclerView(List<Game> games, View view) {
-        RecyclerView gamesRCV = (RecyclerView) view.findViewById(R.id.games_rcv);
+    private void setUpRecyclerView(List<Game> games) {
         gamesRCV.setLayoutManager(new LinearLayoutManager(getActivity()));
         gamesRCV.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         gamesRCV.setAdapter(new GameRCVAdapter(getActivity(), games));

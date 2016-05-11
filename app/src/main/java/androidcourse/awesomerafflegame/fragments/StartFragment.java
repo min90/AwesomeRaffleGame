@@ -3,6 +3,7 @@ package androidcourse.awesomerafflegame.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,32 +19,22 @@ import androidcourse.awesomerafflegame.controllers.SharedPreferencesManager;
  */
 public class StartFragment extends Fragment implements View.OnClickListener {
     public static final String DEBUG_TAG = StartFragment.class.getSimpleName();
-    public static final String NAME_TAG = "name_tag";
 
     private Button btnStartGame;
     private Button btnResults;
     private Button btnAbout;
 
     private String name;
+    private boolean nameChanged = false;
 
     private TextView txtWelcomeMessage, versionTxt;
-
-    public static StartFragment newInstance(String name) {
-        StartFragment fragment = new StartFragment();
-        Bundle args = new Bundle();
-        args.putString(NAME_TAG, name);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_start, container, false);
 
-        Bundle args = getArguments();
-
-        name = args.getString(NAME_TAG);
+        name = SharedPreferencesManager.get().getPlayerName();
 
         btnStartGame = (Button) view.findViewById(R.id.btnStartGame);
         btnStartGame.setOnClickListener(this);
@@ -54,19 +45,29 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         versionTxt = (TextView) view.findViewById(R.id.versionTxt);
 
         txtWelcomeMessage = (TextView) view.findViewById(R.id.txtPlayername);
-        if (name != null) {
-            txtWelcomeMessage.setText("Player: " + name);
-        } else {
-            txtWelcomeMessage.setText("Player");
-        }
+
+        showInfoDialog();
 
         return view;
     }
 
-    private void showInfoDialog(){
-        if(SharedPreferencesManager.get().getFirstTimeUser()){
-            FragmentController.get().transactDialogFragment(getActivity(), new FirstTimeUsersFragment(), "info_fragment");
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        versionTxt.setText(SharedPreferencesManager.get().getVersionName());
+        if (nameChanged) {
+            txtWelcomeMessage.setText("Player: " + name);
+        } else {
+            txtWelcomeMessage.setText("Welcome");
+        }
+
+    }
+
+    private void showInfoDialog() {
+        if (SharedPreferencesManager.get().getFirstTimeUser()) {
+            FragmentController.get().transactDialogFragment(getActivity(), FirstTimeUsersFragment.newInstance(name), "info_fragment");
             SharedPreferencesManager.get().setFirstTimeUser(false);
+            nameChanged = true;
         }
     }
 
@@ -74,25 +75,20 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         FragmentController.get().transactFragments(getActivity(), new PreGameFragment(), "game_fragment");
     }
 
-    private void about() {
-        AboutFragment aboutFragment = new AboutFragment();
-        FragmentController.get().transactFragments(getActivity(), aboutFragment, "about_fragment");
+    private void settings() {
+        SettingsFragment settingsFragment = new SettingsFragment();
+        FragmentController.get().transactFragments(getActivity(), settingsFragment, "settings_fragment");
     }
 
     private void results() {
-        if (name != null) {
-            Fragment resultFragment = ScoresFragment.newInstance(name);
-            FragmentController.get().transactFragments(getActivity(), resultFragment, "result_Fragment");
-        } else {
-            Fragment resultFragment = ScoresFragment.newInstance("Jesper");
-            FragmentController.get().transactFragments(getActivity(), resultFragment, "result_Fragment");
-        }
+        Fragment resultFragment = new ScoresFragment();
+        FragmentController.get().transactFragments(getActivity(), resultFragment, "result_Fragment");
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == btnAbout.getId()) {
-            about();
+            settings();
         }
 
         if (v.getId() == btnStartGame.getId()) {

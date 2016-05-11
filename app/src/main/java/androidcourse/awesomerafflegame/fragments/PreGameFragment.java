@@ -52,7 +52,7 @@ public class PreGameFragment extends Fragment implements View.OnClickListener, C
         btnDisco = (Button) view.findViewById(R.id.btn_make_disco);
         btnDisco.setOnClickListener(this);
 
-        blueLayout = (LinearLayout) view.findViewById(R.id.blueLayout);
+        blueLayout = (LinearLayout) view.findViewById(R.id.blue_layout);
         btnCancel = (Button) view.findViewById(R.id.btn_cancel);
         btnCancel.setOnClickListener(this);
     }

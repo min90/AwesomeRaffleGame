@@ -65,7 +65,7 @@
             android:layout_margin="8dp"
             android:background="@drawable/cool_button"
 
-            android:text="About"/>
+            android:text="Settings"/>
 
         <TextView
             android:layout_width="wrap_content"

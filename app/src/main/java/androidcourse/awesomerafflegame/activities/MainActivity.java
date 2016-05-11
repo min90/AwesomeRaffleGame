@@ -53,12 +53,13 @@ public class MainActivity extends AppCompatActivity {
         //checkAccessToken();
         //createLogin();
 
+        getVersionName();
 
         setUpToolbar();
 
         container = (FrameLayout) findViewById(R.id.fragment_container);
         container.setVisibility(View.VISIBLE);
-        FragmentController.get().transactFragments(this, StartFragment.newInstance("Mogens"), "start_fragment");
+        FragmentController.get().transactFragments(this, new StartFragment(), "start_fragment");
     }
 
     private void getVersionName(){
@@ -135,11 +136,11 @@ public class MainActivity extends AppCompatActivity {
             container.setVisibility(View.VISIBLE);
         }
 
-        StartFragment startFragment;
+        StartFragment startFragment = new StartFragment();
         if (profile != null) {
-            startFragment = StartFragment.newInstance(profile.getName());
+           SharedPreferencesManager.get().setPlayerName(profile.getName());
         } else {
-            startFragment = StartFragment.newInstance(null);
+            SharedPreferencesManager.get().setPlayerName("Player 1");
         }
         FragmentController.get().transactFragments(this, startFragment, "start_fragment");
     }

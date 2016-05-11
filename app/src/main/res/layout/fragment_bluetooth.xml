@@ -24,11 +24,11 @@
         android:text="Play via Bluetooth"/>
 
     <LinearLayout
-        android:id="@+id/blueLayout"
+        android:id="@+id/blue_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <Button
             android:id="@+id/btn_connect_secure"
