@@ -23,6 +23,7 @@ import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.facebook.share.widget.ShareDialog;
 
 import java.util.Arrays;
 
