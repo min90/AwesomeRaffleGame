@@ -42,7 +42,7 @@ public class FragmentController {
             fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
 
-        transactFragments(activity, StartFragment.newInstance(""), "start_fragment");
+        transactFragments(activity, new StartFragment(), "start_fragment");
     }
 
     public void transactDialogFragment(FragmentActivity fragmentActivity, DialogFragment fragment, String backStackTag) {

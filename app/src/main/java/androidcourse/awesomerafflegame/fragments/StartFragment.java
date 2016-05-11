@@ -43,7 +43,7 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         btnAbout = (Button) view.findViewById(R.id.btn_about);
         btnAbout.setOnClickListener(this);
         versionTxt = (TextView) view.findViewById(R.id.tv_version);
-        txtWelcomeMessage = (TextView) view.findViewById(R.id.txtPlayername);
+        txtWelcomeMessage = (TextView) view.findViewById(R.id.tv_playername);
 
         showInfoDialog();
 
