@@ -1,4 +1,4 @@
-package androidcourse.awesomerafflegame.sensors;
+package androidcourse.awesomerafflegame.bluetooth;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
-
-import androidcourse.awesomerafflegame.adapters.Constants;
 
 /**
  * This class does all the work for setting up and managing Bluetooth

@@ -9,7 +9,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import androidcourse.awesomerafflegame.listeners.ConnectionListener;
+import androidcourse.awesomerafflegame.bluetooth.BluetoothHandler;
+import androidcourse.awesomerafflegame.bluetooth.listeners.OnBluetoothConnectionListener;
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.activities.DeviceListActivity;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
@@ -17,7 +18,7 @@ import androidcourse.awesomerafflegame.controllers.FragmentController;
 /**
  * Created by Mads on 09/05/2016.
  */
-public class PreGameFragment extends Fragment implements View.OnClickListener, ConnectionListener {
+public class PreGameFragment extends Fragment implements View.OnClickListener, OnBluetoothConnectionListener {
 
     private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
     private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
@@ -37,6 +38,8 @@ public class PreGameFragment extends Fragment implements View.OnClickListener, C
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        BluetoothHandler.get().setOnBluetoothConnectionListener(this);
+
         btnVsComputer = (Button) view.findViewById(R.id.btn_vs_computer);
         btnVsComputer.setOnClickListener(this);
 
@@ -64,7 +67,6 @@ public class PreGameFragment extends Fragment implements View.OnClickListener, C
             FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_COMPUTER), "game_fragment");
         }
         if (v.getId() == btnVsPlayer.getId()) {
-            BluetoothHandler.get().setConnectionListener(this);
             btnVsComputer.setEnabled(false);
             blueLayout.setVisibility(View.VISIBLE);
         }
@@ -91,7 +93,7 @@ public class PreGameFragment extends Fragment implements View.OnClickListener, C
     }
 
     @Override
-    public void setUpPlayerVsPlayer() {
+    public void onBluetoothConnection() {
         FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_PLAYER), "game_fragment");
     }
 }

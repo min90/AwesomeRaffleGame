@@ -2,7 +2,6 @@ package androidcourse.awesomerafflegame.adapters;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,12 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 
 import androidcourse.awesomerafflegame.R;
-import androidcourse.awesomerafflegame.models.Game;
+import androidcourse.awesomerafflegame.domain.Game;
 import androidcourse.awesomerafflegame.persistence.DatabaseHandler;
 
 /**

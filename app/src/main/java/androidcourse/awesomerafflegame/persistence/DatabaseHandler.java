@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidcourse.awesomerafflegame.models.Game;
+import androidcourse.awesomerafflegame.domain.Game;
 
 /**
  * Created by Mads on 05/04/16.

@@ -1,4 +1,4 @@
-package androidcourse.awesomerafflegame.fragments;
+package androidcourse.awesomerafflegame.bluetooth;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -11,12 +11,10 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidcourse.awesomerafflegame.listeners.OnMessageReceivedListener;
-import androidcourse.awesomerafflegame.listeners.ConnectionListener;
+import androidcourse.awesomerafflegame.bluetooth.listeners.OnBluetoothMessageReceivedListener;
+import androidcourse.awesomerafflegame.bluetooth.listeners.OnBluetoothConnectionListener;
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.activities.DeviceListActivity;
-import androidcourse.awesomerafflegame.adapters.Constants;
-import androidcourse.awesomerafflegame.sensors.BluetoothGameService;
 
 /**
  * This fragment controls Bluetooth to communicate with other devices.
@@ -30,8 +28,8 @@ public class BluetoothHandler {
     private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
     private static final int REQUEST_ENABLE_BT = 3;
 
-    private OnMessageReceivedListener msgReceivedListener;
-    private ConnectionListener connectionListener;
+    private OnBluetoothMessageReceivedListener onBluetoothMessageReceivedListener;
+    private OnBluetoothConnectionListener onBluetoothConnectionListener;
 
     private Context context;
 
@@ -106,12 +104,12 @@ public class BluetoothHandler {
         }
     }
 
-    public void setOnMessageReceivedListener(OnMessageReceivedListener listener) {
-        this.msgReceivedListener = listener;
+    public void setOnBluetoothMessageReceivedListener(OnBluetoothMessageReceivedListener listener) {
+        this.onBluetoothMessageReceivedListener = listener;
     }
 
-    public void setConnectionListener(ConnectionListener listener){
-        this.connectionListener = listener;
+    public void setOnBluetoothConnectionListener(OnBluetoothConnectionListener listener){
+        this.onBluetoothConnectionListener = listener;
     }
 
     /**
@@ -165,13 +163,13 @@ public class BluetoothHandler {
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    msgReceivedListener.onMessageReceived(readMessage);
+                    onBluetoothMessageReceivedListener.onMessageReceived(readMessage);
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name
                     mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
                     if (null != activity) {
-                        connectionListener.setUpPlayerVsPlayer();
+                        onBluetoothConnectionListener.onBluetoothConnection();
                         Toast.makeText(activity, "Connected to " + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
                     }
                     break;

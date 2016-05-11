@@ -21,32 +21,35 @@ import android.widget.Toast;
 
 import java.util.Random;
 
-import androidcourse.awesomerafflegame.listeners.OnMessageReceivedListener;
+import androidcourse.awesomerafflegame.bluetooth.BluetoothHandler;
+import androidcourse.awesomerafflegame.bluetooth.listeners.OnBluetoothMessageReceivedListener;
 import androidcourse.awesomerafflegame.R;
-import androidcourse.awesomerafflegame.models.Game;
+import androidcourse.awesomerafflegame.domain.Game;
 import androidcourse.awesomerafflegame.persistence.DatabaseHandler;
 import androidcourse.awesomerafflegame.sensors.ShakeSensor;
 
 /**
  * Created by Mads on 01/05/16.
  */
-public class GameFragment extends Fragment implements View.OnClickListener, ShakeSensor.OnShakeListener, OnMessageReceivedListener {
+public class GameFragment extends Fragment implements View.OnClickListener, ShakeSensor.OnShakeListener, OnBluetoothMessageReceivedListener {
 
     private final int PLAYER_ONE = 1;
     private final int PLAYER_TWO = 2;
     private final int COMPUTER = 3;
 
-    private final int SWAP_TURNS = 10;
-    private final int LOST_ALL_POINTS = 11;
-    private final int LOST_POINTS_FOR_ROUND = 12;
+    private int SWAP_TURNS = 10;
+    private int LOST_ALL_POINTS = 11;
+    private int LOST_POINTS_FOR_ROUND = 12;
 
     public static final int VS_PLAYER = 20;
     public static final int VS_COMPUTER = 21;
 
     private static final String TAG_VERSUS = "versus";
 
-    private static final String TAG_SCORE = "score";
-    private static final String TAG_SWAP = "swap";
+    private final String TAG_SCORE = "score";
+    private final String TAG_SWAP = "swap";
+    private final String TAG_RESET = "reset";
+    private final String TAG_WHO_STARTS = "who_starts";
 
     private ShakeSensor shakeSensor;
     private BluetoothHandler bluetoothHandler;
@@ -61,8 +64,14 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
 
     private Button bHandOverDice;
 
+    private AlertDialog endOfGameDialog;
+
     private int currentPlayer;
     private String currentPlayerName;
+
+    private boolean vsPlayer;
+
+    private int initialRoll;
 
     private int playerOneTotalScore;
     private int opponentTotalScore;
@@ -81,21 +90,23 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_game, container, false);
 
-        this.shakeSensor = new ShakeSensor(getActivity());
-        this.shakeSensor.setOnShakeListener(this);
+        shakeSensor = new ShakeSensor(getActivity());
+        shakeSensor.setOnShakeListener(this);
 
         bluetoothHandler = BluetoothHandler.get();
-        bluetoothHandler.setOnMessageReceivedListener(this);
+        bluetoothHandler.setOnBluetoothMessageReceivedListener(this);
 
         currentPlayer = PLAYER_ONE;
 
         // Perhaps get players real name
         currentPlayerName = "Player 1";
 
-        initTextViews(view);
-
         playerOneTotalScore = 0;
         roundScore = 0;
+
+        vsPlayer = getArguments().getInt(TAG_VERSUS) == VS_PLAYER;
+
+        initTextViews(view);
 
         bHandOverDice = (Button) view.findViewById(R.id.btn_hand_over_dice);
         bHandOverDice.setOnClickListener(this);
@@ -103,23 +114,26 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         initDiceIcons(view);
 
         setHasOptionsMenu(true);
+        if (vsPlayer) {
+            chooseWhoStarts();
+        }
 
         return view;
     }
 
     private void initTextViews(View view) {
-        String opponentName = getArguments().getInt(TAG_VERSUS) == VS_COMPUTER ? "Computer" : "Player 2";
+        String opponentName = vsPlayer ? "Player 2" : "Computer";
         TextView tvOpponentName = (TextView) view.findViewById(R.id.tv_opponent_name);
         tvOpponentName.setText(opponentName);
 
         tvCurrentPlayer = (TextView) view.findViewById(R.id.tv_current_player);
 
-        tvPlayerOneScore = (TextView) view.findViewById(R.id.player_one_score);
-        tvOpponentScore = (TextView) view.findViewById(R.id.opponent_score);
+        tvPlayerOneScore = (TextView) view.findViewById(R.id.tv_player_one_total_score);
+        tvOpponentScore = (TextView) view.findViewById(R.id.tv_opponent_total_score);
 
-        tvRoundScore = (TextView) view.findViewById(R.id.round_score);
+        tvRoundScore = (TextView) view.findViewById(R.id.tv_round_score);
 
-        tvAnnouncement = (TextView) view.findViewById(R.id.announcement);
+        tvAnnouncement = (TextView) view.findViewById(R.id.tv_announcement);
     }
 
     private void initDiceIcons(View view) {
@@ -132,6 +146,12 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         ivDieTwo.setBackgroundResource(R.drawable.anim_dice_3to2);
         dieTwoAnimation = (AnimationDrawable) ivDieTwo.getBackground();
         dieTwoAnimation.selectDrawable(new Random().nextInt(6));
+    }
+
+    private void chooseWhoStarts() {
+        int face = new Random().nextInt(6) + 1;
+        initialRoll = face;
+        bluetoothHandler.sendMessage(TAG_WHO_STARTS + "," + face);
     }
 
     private void resetDice() {
@@ -199,7 +219,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         if (faceOne == 1 && faceTwo == 1) {
             playerOneTotalScore = 0;
 
-            if (getArguments().getInt(TAG_VERSUS) == VS_PLAYER) {
+            if (vsPlayer) {
                 // Playing via Bluetooth - send result to opponent
                 toggleControls(false);
                 bluetoothHandler.sendMessage(TAG_SWAP + "," + LOST_ALL_POINTS);
@@ -211,7 +231,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
                 playerOneTotalScore -= roundScore;
             }
 
-            if (getArguments().getInt(TAG_VERSUS) == VS_PLAYER) {
+            if (vsPlayer) {
                 // Playing via Bluetooth - send result to opponent
                 toggleControls(false);
                 bluetoothHandler.sendMessage(TAG_SWAP + "," + LOST_POINTS_FOR_ROUND + "," + roundScore);
@@ -222,14 +242,14 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
             roundScore += (faceOne + faceTwo);
             playerOneTotalScore += (faceOne + faceTwo);
 
-            if (getArguments().getInt(TAG_VERSUS) == VS_PLAYER) {
+            if (vsPlayer) {
                 // Playing via Bluetooth - send result to opponent
                 bluetoothHandler.sendMessage(TAG_SCORE + "," + faceOne + "," + faceTwo);
             }
 
             if (playerOneTotalScore >= 100) {
                 playerOneTotalScore = 100;
-                tvAnnouncement.setText("Player 1 won!");
+                tvAnnouncement.setText("You won!");
                 endGame(PLAYER_ONE);
             }
         }
@@ -252,8 +272,14 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
             opponentTotalScore += (faceOne + faceTwo);
             if (opponentTotalScore >= 100) {
                 opponentTotalScore = 100;
-                tvAnnouncement.setText("Computer won!");
-                endGame(COMPUTER);
+
+                if (getArguments().getInt(TAG_VERSUS) == VS_PLAYER) {
+                    tvAnnouncement.setText("They won!");
+                    endGame(PLAYER_TWO);
+                } else {
+                    tvAnnouncement.setText("Computer won!");
+                    endGame(COMPUTER);
+                }
             } else {
                 if (getArguments().getInt(TAG_VERSUS) == VS_COMPUTER) {
                     doComputerTurn();
@@ -288,7 +314,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
                 toggleControls(true);
             }
             tvCurrentPlayer.setText(String.format("%s has the dice", currentPlayerName));
-        } else if (getArguments().getInt(TAG_VERSUS) == VS_PLAYER) {
+        } else if (vsPlayer) {
             tvCurrentPlayer.setText(String.format("%s have the dice", playerName));
         }
 
@@ -349,6 +375,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
                 break;
             case COMPUTER:
                 game.setWinner("Computer");
+                break;
         }
 
         game.setPlayerScore(playerOneTotalScore);
@@ -368,17 +395,18 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 resetGame();
+                dialog.dismiss();
             }
         });
 
         dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //return to home
+                dialog.dismiss();
             }
         });
 
-        dialog.create();
+        endOfGameDialog = dialog.create();
         dialog.show();
     }
 
@@ -386,11 +414,14 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         playerOneTotalScore = 0;
         opponentTotalScore = 0;
         roundScore = 0;
-        tvPlayerOneScore.setText("0");
-        tvOpponentScore.setText("0");
+        tvPlayerOneScore.setText(playerOneTotalScore);
+        tvOpponentScore.setText(opponentTotalScore);
+        tvRoundScore.setText(roundScore);
 
         if (currentPlayer == COMPUTER) {
             handOverDice(SWAP_TURNS, "You");
+        } else if (vsPlayer) {
+            bluetoothHandler.sendMessage(TAG_RESET);
         }
     }
 
@@ -412,10 +443,24 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
 
     @Override
     public void onMessageReceived(String message) {
-        Toast.makeText(getActivity(), "MSG: " + message, Toast.LENGTH_SHORT).show();
-        if (message.split(",")[0].equals(TAG_SCORE) && message.split(",").length > 1) {
+        if (message.split(",")[0].equals(TAG_WHO_STARTS)) {
+            if (Integer.parseInt(message.split(",")[1]) > initialRoll) {
+
+                //Their initial roll was bigger, hand over the dice to them
+                Toast.makeText(getActivity(), "They start!", Toast.LENGTH_SHORT).show();
+                bHandOverDice.performClick();
+            } else {
+
+                // Your initial roll was bigger, keep the dice
+                Toast.makeText(getActivity(), "You start!", Toast.LENGTH_SHORT).show();
+            }
+        } else if (message.split(",")[0].equals(TAG_SCORE) && message.split(",").length > 1) {
+
+            //Message contains a SCORE - update opponents score
             updateOpponentScore(Integer.parseInt(message.split(",")[1]), Integer.parseInt(message.split(",")[2]));
         } else if (message.split(",")[0].equals(TAG_SWAP)) {
+
+            //Message contains a SWAP request, and additional information - update accordingly
             if (message.split(",")[1].equals(String.valueOf(LOST_ALL_POINTS))) {
                 opponentTotalScore = 0;
             } else if (message.split(",")[1].equals(String.valueOf(LOST_POINTS_FOR_ROUND))) {
@@ -424,6 +469,11 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
             tvOpponentScore.setText(String.valueOf(opponentTotalScore));
             toggleControls(true);
             handOverDice(SWAP_TURNS, "You");
+        } else if (message.equals(TAG_RESET)) {
+            resetGame();
+            chooseWhoStarts();
+
+            endOfGameDialog.dismiss();
         }
     }
 
