@@ -18,6 +18,9 @@ import androidcourse.awesomerafflegame.activities.DeviceListActivity;
 
 /**
  * This fragment controls Bluetooth to communicate with other devices.
+ *
+ * Inspired from Androids Bluetooth Chat example
+ * https://developer.android.com/samples/BluetoothChat/index.html
  */
 public class BluetoothHandler {
 
@@ -33,19 +36,11 @@ public class BluetoothHandler {
 
     private Context context;
 
-    /**
-     * Name of the connected device
-     */
     private String mConnectedDeviceName = null;
 
-    /**
-     * Local Bluetooth adapter
-     */
     private BluetoothAdapter mBluetoothAdapter = null;
 
-    /**
-     * Member object for the chat services
-     */
+
     private BluetoothGameService mGameService = null;
 
     private static BluetoothHandler instance = null;
@@ -79,7 +74,7 @@ public class BluetoothHandler {
         if (!mBluetoothAdapter.isEnabled() && mBluetoothAdapter != null) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             ((Activity) context).startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-            // Otherwise, setup the chat session
+            // Otherwise, setup the game session
         } else if (mGameService == null) {
             setupGame();
         }
@@ -102,7 +97,7 @@ public class BluetoothHandler {
         if (mGameService != null) {
             // Only if the state is STATE_NONE, do we know that we haven't started already
             if (mGameService.getState() == BluetoothGameService.STATE_NONE) {
-                // Start the Bluetooth chat services
+                // Start the Bluetooth game services
                 mGameService.start();
             }
         }
@@ -122,13 +117,11 @@ public class BluetoothHandler {
     private void setupGame() {
         Log.d(TAG, "setupGame()");
 
-        // Initialize the BluetoothChatService to perform bluetooth connections
+        // Initialize the BluetoothGameService to perform bluetooth connections
         mGameService = new BluetoothGameService(context, mHandler);
     }
 
-    /**
-     * Makes this device discoverable.
-     */
+
     public void ensureDiscoverable() {
         if (mBluetoothAdapter.getScanMode() !=
                 BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
@@ -204,7 +197,7 @@ public class BluetoothHandler {
             case REQUEST_ENABLE_BT:
                 // When the request to enable Bluetooth returns
                 if (resultCode == Activity.RESULT_OK) {
-                    // Bluetooth is now enabled, so set up a chat session
+                    // Bluetooth is now enabled, so set up a game session
                     setupGame();
                 } else {
                     // User did not enable Bluetooth or an error occurred
@@ -215,16 +208,9 @@ public class BluetoothHandler {
         }
     }
 
-    /**
-     * Establish connection with other device
-     *
-     * @param data   An {@link Intent} with {@link DeviceListActivity#EXTRA_DEVICE_ADDRESS} extra.
-     * @param secure Socket Security type - Secure (true) , Insecure (false)
-     */
     private void connectDevice(Intent data, boolean secure) {
         // Get the device MAC address
-        String address = data.getExtras()
-                .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+        String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
         // Get the BluetoothDevice object
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         // Attempt to connect to the device
