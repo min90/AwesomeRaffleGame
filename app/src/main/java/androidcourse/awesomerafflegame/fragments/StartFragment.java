@@ -1,9 +1,11 @@
 package androidcourse.awesomerafflegame.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.Profile;
+import com.facebook.ProfileTracker;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
+import java.util.Arrays;
 
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
@@ -30,6 +44,9 @@ public class StartFragment extends Fragment implements View.OnClickListener {
     private LinearLayout playerNameLayout;
     private LinearLayout loggedInLayout;
     private EditText edtPlayerName;
+    private LoginButton loginButton;
+    private CallbackManager callbackManager;
+    private AccessToken accessToken;
 
     private String name;
 
@@ -41,6 +58,7 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         View view = inflater.inflate(R.layout.fragment_start, container, false);
 
         name = SharedPreferencesManager.get().getPlayerName();
+        callbackManager = CallbackManager.Factory.create();
 
         btnStartGame = (Button) view.findViewById(R.id.btn_start_game);
         btnStartGame.setOnClickListener(this);
@@ -58,6 +76,10 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         playerNameLayout = (LinearLayout) view.findViewById(R.id.player_name_layout);
         edtPlayerName = (EditText) view.findViewById(R.id.edt_player_name);
 
+        loginButton = (LoginButton) view.findViewById(R.id.login_button);
+
+        createLogin();
+        checkAccessToken();
 
         firstTimeUser();
 
@@ -70,8 +92,72 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
         versionTxt.setText(SharedPreferencesManager.get().getVersionName());
         txtWelcomeMessage.setText("Player: " + SharedPreferencesManager.get().getPlayerName());
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void createLogin() {
+        loginButton.setFragment(this);
+        loginButton.setReadPermissions(Arrays.asList("public_profile"));
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                ProfileTracker profileTracker = new ProfileTracker() {
+                    @Override
+                    protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+                        this.stopTracking();
+                        Profile.setCurrentProfile(currentProfile);
+                        createStartView(currentProfile);
+                        Log.d(DEBUG_TAG, "Profile: " + currentProfile.getName());
+
+                    }
+                };
+                profileTracker.startTracking();
+
+                accessToken = loginResult.getAccessToken();
+                Log.d(DEBUG_TAG, "Accesstoken: " + accessToken.toString());
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d(DEBUG_TAG, "Login cancelled");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.d(DEBUG_TAG, "Error logging in: " + error.toString());
+            }
+        });
+
+        AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+                Log.d(DEBUG_TAG, "Logged out");
+                btnNoFacebook.setVisibility(View.VISIBLE);
+                loggedInLayout.setVisibility(View.GONE);
+            }
+        };
+    }
+
+    private void checkAccessToken() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken == null || accessToken.isExpired()) {
+            createLogin();
+            SharedPreferencesManager.get().setFirstTimeUser(true);
+            Log.d(DEBUG_TAG, "Not logged in");
+        }
+    }
 
 
+
+    private void createStartView(Profile profile){
+        txtWelcomeMessage.setText("Player: " + profile.getName());
+        SharedPreferencesManager.get().setPlayerName(profile.getName());
+        btnNoFacebook.setVisibility(View.GONE);
+        loggedInLayout.setVisibility(View.VISIBLE);
     }
 
     private void firstTimeUser() {
@@ -114,6 +200,7 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         }
         if (v.getId() == btnNoFacebook.getId()) {
             if (btnNoFacebook.getVisibility() == View.VISIBLE) {
+                loginButton.setVisibility(View.GONE);
                 btnNoFacebook.setVisibility(View.GONE);
                 loggedInLayout.setVisibility(View.VISIBLE);
                 playerNameLayout.setVisibility(View.VISIBLE);
