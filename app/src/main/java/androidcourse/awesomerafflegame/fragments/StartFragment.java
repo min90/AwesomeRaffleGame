@@ -28,7 +28,7 @@ import java.util.Arrays;
 
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
-import androidcourse.awesomerafflegame.controllers.SharedPreferencesManager;
+import androidcourse.awesomerafflegame.persistence.SharedPreferencesManager;
 
 /**
  * Created by Jesper on 04/04/16.
