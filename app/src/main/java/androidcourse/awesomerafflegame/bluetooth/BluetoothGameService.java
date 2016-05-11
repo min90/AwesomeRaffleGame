@@ -20,6 +20,9 @@ import java.util.UUID;
  * connections with other devices. It has a thread that listens for
  * incoming connections, a thread for connecting with a device, and a
  * thread for performing data transmissions when connected.
+ *
+ * Inspired from Androids Bluetooth Chat example
+ * https://developer.android.com/samples/BluetoothChat/index.html
  */
 public class BluetoothGameService {
     // Debugging
@@ -30,10 +33,8 @@ public class BluetoothGameService {
     private static final String NAME_INSECURE = "BluetoothGameInsecure";
 
     // Unique UUID for this application
-    private static final UUID MY_UUID_SECURE =
-            UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
-    private static final UUID MY_UUID_INSECURE =
-            UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
+    private static final UUID MY_UUID_SECURE = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
+    private static final UUID MY_UUID_INSECURE = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
 
     // Member fields
     private final BluetoothAdapter mAdapter;
@@ -63,7 +64,7 @@ public class BluetoothGameService {
     }
 
     /**
-     * Set the current state of the chat connection
+     * Set the current state of the game connection
      *
      * @param state An integer defining the current connection state
      */
@@ -149,8 +150,7 @@ public class BluetoothGameService {
      * @param socket The BluetoothSocket on which the connection was made
      * @param device The BluetoothDevice that has been connected
      */
-    public synchronized void connected(BluetoothSocket socket, BluetoothDevice
-            device, final String socketType) {
+    public synchronized void connected(BluetoothSocket socket, BluetoothDevice device, final String socketType) {
         Log.d(TAG, "connected, Socket Type:" + socketType);
 
         // Cancel the thread that completed the connection
@@ -236,7 +236,7 @@ public class BluetoothGameService {
     }
 
     /**
-     * Indicate that the connection attempt failed and notify the UI Activity.
+     * Indicate that the connection attempt failed and notify the Game.
      */
     private void connectionFailed() {
         // Send a failure message back to the Activity
@@ -251,7 +251,7 @@ public class BluetoothGameService {
     }
 
     /**
-     * Indicate that the connection was lost and notify the UI Activity.
+     * Indicate that the connection was lost and notify the Game.
      */
     private void connectionLost() {
         // Send a failure message back to the Activity
@@ -367,11 +367,9 @@ public class BluetoothGameService {
             // given BluetoothDevice
             try {
                 if (secure) {
-                    tmp = device.createRfcommSocketToServiceRecord(
-                            MY_UUID_SECURE);
+                    tmp = device.createRfcommSocketToServiceRecord(MY_UUID_SECURE);
                 } else {
-                    tmp = device.createInsecureRfcommSocketToServiceRecord(
-                            MY_UUID_INSECURE);
+                    tmp = device.createInsecureRfcommSocketToServiceRecord(MY_UUID_INSECURE);
                 }
             } catch (IOException e) {
                 Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
