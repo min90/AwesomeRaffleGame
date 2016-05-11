@@ -31,36 +31,38 @@
             android:layout_marginTop="30dp"/>
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:id="@+id/player_name_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/player_name_layout"
+            android:orientation="horizontal"
             android:visibility="gone">
 
             <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:inputType="textPersonName"
-                android:ems="10"
                 android:id="@+id/edt_player_name"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginLeft="16dp"
-                android:hint="Enter your player name" />
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="Enter your player name"
+                android:inputType="textPersonName"/>
 
             <Button
+                android:id="@+id/btn_save_player_name"
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Save"
-                android:id="@+id/btn_save_player_name"
-                android:layout_gravity="right" />
+                android:layout_gravity="right"
+                android:layout_weight="2"
+                android:text="Save"/>
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/logged_in_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/logged_in_layout"
+            android:orientation="vertical"
             android:visibility="gone">
 
             <TextView
@@ -74,7 +76,7 @@
                 android:gravity="center_vertical|center_horizontal"
                 android:text="Player name"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:visibility="visible" />
+                android:visibility="visible"/>
 
             <Button
                 android:id="@+id/btn_start_game"
@@ -102,23 +104,23 @@
                 android:text="Settings"/>
 
             <TextView
+                android:id="@+id/tv_version"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="version"
-                android:id="@+id/tv_version"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="6dp" />
+                android:layout_marginTop="6dp"
+                android:text="version"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
         </LinearLayout>
 
         <Button
+            android:id="@+id/btn_without_facebook"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Proceed WIth out facebook"
-            android:id="@+id/btn_without_facebook"
             android:layout_gravity="center_horizontal"
             android:background="@drawable/cool_button"
-            android:visibility="visible" />
+            android:text="Proceed WIth out facebook"
+            android:visibility="visible"/>
     </LinearLayout>
 
 </LinearLayout>
