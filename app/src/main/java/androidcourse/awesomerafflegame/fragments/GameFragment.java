@@ -442,12 +442,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
     }
 
     private void resetGame() {
-        playerOneTotalScore = 0;
-        opponentTotalScore = 0;
-        roundScore = 0;
-        tvPlayerOneScore.setText(playerOneTotalScore);
-        tvOpponentScore.setText(opponentTotalScore);
-        tvRoundScore.setText(roundScore);
+        tvPlayerOneScore.setText(Integer.toString(playerOneTotalScore = 0));
+        tvOpponentScore.setText(Integer.toString(opponentTotalScore = 0));
+        tvRoundScore.setText(Integer.toString(roundScore = 0));
 
         if (currentPlayer == COMPUTER) {
             handOverDice(SWAP_TURNS);
