@@ -69,8 +69,6 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
 
     private Button bHandOverDice;
 
-    private AlertDialog endOfGameDialog;
-
     private int currentPlayer;
     private String playerName;
     private String opponentName;
@@ -437,7 +435,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
             }
         });
 
-        endOfGameDialog = dialog.create();
+        dialog.create();
         dialog.show();
     }
 
@@ -511,9 +509,6 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
             toggleControls(true);
         } else if (message.equals(TAG_RESET)) {
             resetGame();
-            chooseWhoStarts();
-
-            endOfGameDialog.dismiss();
         }
     }
 
