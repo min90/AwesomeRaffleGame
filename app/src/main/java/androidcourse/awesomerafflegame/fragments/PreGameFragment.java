@@ -37,16 +37,21 @@ public class PreGameFragment extends Fragment implements View.OnClickListener, C
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        btnVsComputer = (Button) view.findViewById(R.id.btnVsComputer);
+        btnVsComputer = (Button) view.findViewById(R.id.btn_vs_computer);
         btnVsComputer.setOnClickListener(this);
-        btnVsPlayer = (Button) view.findViewById(R.id.btnVsPlayer);
+
+        btnVsPlayer = (Button) view.findViewById(R.id.btn_vs_player);
         btnVsPlayer.setOnClickListener(this);
+
         btnSecure = (Button) view.findViewById(R.id.btn_connect_secure);
         btnSecure.setOnClickListener(this);
+
         btnInsecure = (Button) view.findViewById(R.id.btn_connect_insecure);
         btnInsecure.setOnClickListener(this);
+
         btnDisco = (Button) view.findViewById(R.id.btn_make_disco);
         btnDisco.setOnClickListener(this);
+
         blueLayout = (LinearLayout) view.findViewById(R.id.blueLayout);
         btnCancel = (Button) view.findViewById(R.id.btn_cancel);
         btnCancel.setOnClickListener(this);
@@ -54,14 +59,14 @@ public class PreGameFragment extends Fragment implements View.OnClickListener, C
 
     @Override
     public void onClick(View v) {
+        if (v.getId() == btnVsComputer.getId()) {
+            blueLayout.setVisibility(View.GONE);
+            FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_COMPUTER), "game_fragment");
+        }
         if (v.getId() == btnVsPlayer.getId()) {
             BluetoothHandler.get().setConnectionListener(this);
             btnVsComputer.setEnabled(false);
             blueLayout.setVisibility(View.VISIBLE);
-        }
-        if (v.getId() == btnVsComputer.getId()) {
-            blueLayout.setVisibility(View.GONE);
-            FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_COMPUTER), "game_fragment");
         }
         if (v.getId() == btnSecure.getId()) {
             Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);

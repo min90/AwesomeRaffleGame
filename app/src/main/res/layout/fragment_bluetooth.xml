@@ -6,7 +6,7 @@
               android:orientation="vertical">
 
     <Button
-        android:id="@+id/btnVsComputer"
+        android:id="@+id/btn_vs_computer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -15,7 +15,7 @@
         android:text="Play against computer"/>
 
     <Button
-        android:id="@+id/btnVsPlayer"
+        android:id="@+id/btn_vs_player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
