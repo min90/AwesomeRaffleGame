@@ -85,10 +85,14 @@ public class BluetoothHandler {
         }
     }
 
-    public void onDestroy() {
+    public void stopGameService() {
         if (mGameService != null) {
             mGameService.stop();
         }
+    }
+
+    public void onDestroy() {
+        stopGameService();
     }
 
     public void onResume() {
@@ -108,7 +112,7 @@ public class BluetoothHandler {
         this.onBluetoothMessageReceivedListener = listener;
     }
 
-    public void setOnBluetoothConnectionListener(OnBluetoothConnectionListener listener){
+    public void setOnBluetoothConnectionListener(OnBluetoothConnectionListener listener) {
         this.onBluetoothConnectionListener = listener;
     }
 

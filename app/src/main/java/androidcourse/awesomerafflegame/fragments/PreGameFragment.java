@@ -96,4 +96,10 @@ public class PreGameFragment extends Fragment implements View.OnClickListener, O
     public void onBluetoothConnection() {
         FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_PLAYER), "game_fragment");
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        BluetoothHandler.get().onResume();
+    }
 }
