@@ -45,15 +45,15 @@ public class StartFragment extends Fragment implements View.OnClickListener {
 
         name = args.getString(NAME_TAG);
 
-        btnStartGame = (Button) view.findViewById(R.id.btnStartGame);
+        btnStartGame = (Button) view.findViewById(R.id.btn_start_game);
         btnStartGame.setOnClickListener(this);
-        btnResults = (Button) view.findViewById(R.id.btnResults);
+        btnResults = (Button) view.findViewById(R.id.btn_results);
         btnResults.setOnClickListener(this);
-        btnAbout = (Button) view.findViewById(R.id.btnAbout);
+        btnAbout = (Button) view.findViewById(R.id.btn_about);
         btnAbout.setOnClickListener(this);
-        versionTxt = (TextView) view.findViewById(R.id.versionTxt);
+        versionTxt = (TextView) view.findViewById(R.id.tv_version);
 
-        txtWelcomeMessage = (TextView) view.findViewById(R.id.txtPlayername);
+        txtWelcomeMessage = (TextView) view.findViewById(R.id.tv_playername);
         if (name != null) {
             txtWelcomeMessage.setText("Player: " + name);
         } else {
