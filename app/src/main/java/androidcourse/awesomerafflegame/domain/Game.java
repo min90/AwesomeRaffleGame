@@ -1,4 +1,4 @@
-package androidcourse.awesomerafflegame.models;
+package androidcourse.awesomerafflegame.domain;
 
 /**
  * Created by Mads on 06/05/2016.

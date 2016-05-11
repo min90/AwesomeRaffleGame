@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -15,9 +14,9 @@ import java.util.List;
 
 
 import androidcourse.awesomerafflegame.R;
-import androidcourse.awesomerafflegame.adapters.DividerItemDecoration;
+import androidcourse.awesomerafflegame.adapters.RCVDividerItemDecoration;
 import androidcourse.awesomerafflegame.adapters.GameRCVAdapter;
-import androidcourse.awesomerafflegame.models.Game;
+import androidcourse.awesomerafflegame.domain.Game;
 import androidcourse.awesomerafflegame.persistence.DatabaseHandler;
 
 /**
@@ -54,7 +53,7 @@ public class ScoresFragment extends Fragment {
     private void setUpRecyclerView(List<Game> games, View view) {
         RecyclerView gamesRCV = (RecyclerView) view.findViewById(R.id.games_rcv);
         gamesRCV.setLayoutManager(new LinearLayoutManager(getActivity()));
-        gamesRCV.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
+        gamesRCV.addItemDecoration(new RCVDividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         gamesRCV.setAdapter(new GameRCVAdapter(getActivity(), games));
 
     }

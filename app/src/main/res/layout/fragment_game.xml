@@ -41,7 +41,7 @@
                     android:textSize="20dp"/>
 
                 <TextView
-                    android:id="@+id/player_one_score"
+                    android:id="@+id/tv_player_one_total_score"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -66,7 +66,7 @@
                     android:textSize="20dp"/>
 
                 <TextView
-                    android:id="@+id/opponent_score"
+                    android:id="@+id/tv_opponent_total_score"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -95,7 +95,7 @@
             android:textSize="20dp"/>
 
         <TextView
-            android:id="@+id/round_score"
+            android:id="@+id/tv_round_score"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -104,7 +104,7 @@
             android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/announcement"
+            android:id="@+id/tv_announcement"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"

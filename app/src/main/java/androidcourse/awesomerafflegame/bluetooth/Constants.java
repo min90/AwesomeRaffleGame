@@ -1,4 +1,4 @@
-package androidcourse.awesomerafflegame.adapters;
+package androidcourse.awesomerafflegame.bluetooth;
 
 /**
  * Created by Jesper on 05/05/16.

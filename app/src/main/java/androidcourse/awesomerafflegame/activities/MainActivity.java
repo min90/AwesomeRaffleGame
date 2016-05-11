@@ -29,7 +29,7 @@ import java.util.Arrays;
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
 import androidcourse.awesomerafflegame.controllers.SharedPreferencesManager;
-import androidcourse.awesomerafflegame.fragments.BluetoothHandler;
+import androidcourse.awesomerafflegame.bluetooth.BluetoothHandler;
 import androidcourse.awesomerafflegame.fragments.StartFragment;
 
 public class MainActivity extends AppCompatActivity {

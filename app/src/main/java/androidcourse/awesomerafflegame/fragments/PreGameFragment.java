@@ -9,7 +9,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import androidcourse.awesomerafflegame.listeners.OnBluetoothConnectionListener;
+import androidcourse.awesomerafflegame.bluetooth.BluetoothHandler;
+import androidcourse.awesomerafflegame.bluetooth.listeners.OnBluetoothConnectionListener;
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.activities.DeviceListActivity;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
