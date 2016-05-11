@@ -33,18 +33,19 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     private final int PLAYER_TWO = 2;
     private final int COMPUTER = 3;
 
-    private final int SWAP_TURNS = 10;
-    private final int LOST_ALL_POINTS = 11;
-    private final int LOST_POINTS_FOR_ROUND = 12;
+    private int SWAP_TURNS = 10;
+    private int LOST_ALL_POINTS = 11;
+    private int LOST_POINTS_FOR_ROUND = 12;
 
     public static final int VS_PLAYER = 20;
     public static final int VS_COMPUTER = 21;
 
     private static final String TAG_VERSUS = "versus";
 
-    private static final String TAG_SCORE = "score";
-    private static final String TAG_SWAP = "swap";
-    private static final String TAG_RESET = "reset";
+    private final String TAG_SCORE = "score";
+    private final String TAG_SWAP = "swap";
+    private final String TAG_RESET = "reset";
+    private final String TAG_WHO_STARTS = "who_starts";
 
     private ShakeSensor shakeSensor;
     private BluetoothHandler bluetoothHandler;
@@ -63,6 +64,8 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     private String currentPlayerName;
 
     private boolean vsPlayer;
+
+    private int initialRoll;
 
     private int playerOneTotalScore;
     private int opponentTotalScore;
@@ -105,7 +108,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         initDiceIcons(view);
 
         if (vsPlayer) {
-            // choose who begins
+            chooseWhoStarts();
         }
 
         return view;
@@ -136,6 +139,12 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         ivDieTwo.setBackgroundResource(R.drawable.anim_dice_3to2);
         dieTwoAnimation = (AnimationDrawable) ivDieTwo.getBackground();
         dieTwoAnimation.selectDrawable(new Random().nextInt(6));
+    }
+
+    private void chooseWhoStarts() {
+        int face = new Random().nextInt(6) + 1;
+        initialRoll = face;
+        bluetoothHandler.sendMessage(TAG_WHO_STARTS + "," + face);
     }
 
     private void resetDice() {
@@ -425,7 +434,14 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
 
     @Override
     public void onMessageReceived(String message) {
-        if (message.split(",")[0].equals(TAG_SCORE) && message.split(",").length > 1) {
+        if (message.split(",")[0].equals(TAG_WHO_STARTS)) {
+            if(Integer.parseInt(message.split(",")[1]) > initialRoll) {
+                /**
+                 * Their initial roll were bigger, hand over the dice to them
+                 */
+                bHandOverDice.performClick();
+            }
+        } else if (message.split(",")[0].equals(TAG_SCORE) && message.split(",").length > 1) {
             /**
              * Message contains a SCORE - update opponents score
              */
