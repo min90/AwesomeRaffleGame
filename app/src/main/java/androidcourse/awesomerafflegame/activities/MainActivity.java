@@ -1,6 +1,7 @@
 package androidcourse.awesomerafflegame.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentController.get().transactFragments(this, new StartFragment(), "start_fragment");
     }
 
-    private void getVersionName(){
+    private void getVersionName() {
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String version = pInfo.versionName;
@@ -100,6 +101,12 @@ public class MainActivity extends AppCompatActivity {
             FragmentController.get().transactFragments(this, new SettingsFragment(), "settings_fragment");
             return true;
         }
+        if (id == R.id.action_log_out) {
+            SharedPreferencesManager.get().setFirstTimeUser(true);
+            SharedPreferencesManager.get().setPlayerName("Player 1");
+            FragmentController.get().transactFragments(this, new StartFragment(), "start_fragment");
+        }
+
 
         return super.onOptionsItemSelected(item);
     }

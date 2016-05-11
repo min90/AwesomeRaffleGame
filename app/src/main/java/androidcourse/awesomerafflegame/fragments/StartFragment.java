@@ -49,6 +49,8 @@ public class StartFragment extends Fragment implements View.OnClickListener {
     private CallbackManager callbackManager;
     private AccessToken accessToken;
 
+    private boolean loggedInWithFacebook = false;
+
     private String name;
 
     private TextView txtWelcomeMessage, versionTxt;
@@ -112,6 +114,7 @@ public class StartFragment extends Fragment implements View.OnClickListener {
                         this.stopTracking();
                         Profile.setCurrentProfile(currentProfile);
                         createStartView(currentProfile);
+                        loggedInWithFacebook = true;
                         Log.d(DEBUG_TAG, "Profile: " + currentProfile.getName());
 
                     }
@@ -145,7 +148,7 @@ public class StartFragment extends Fragment implements View.OnClickListener {
 
     private void checkAccessToken() {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if (accessToken == null || accessToken.isExpired()) {
+        if (loggedInWithFacebook && (accessToken == null || accessToken.isExpired())) {
             createLogin();
             SharedPreferencesManager.get().setFirstTimeUser(true);
             Log.d(DEBUG_TAG, "Not logged in");
@@ -212,6 +215,7 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         if (v.getId() == btnSavePlayerName.getId()) {
             if (!edtPlayerName.getText().toString().equalsIgnoreCase("")) {
                 SharedPreferencesManager.get().setPlayerName(edtPlayerName.getText().toString());
+                SharedPreferencesManager.get().setFirstTimeUser(false);
                 playerNameLayout.setVisibility(View.GONE);
                 txtWelcomeMessage.setText("Player: " + SharedPreferencesManager.get().getPlayerName());
                 txtWelcomeMessage.setVisibility(View.VISIBLE);

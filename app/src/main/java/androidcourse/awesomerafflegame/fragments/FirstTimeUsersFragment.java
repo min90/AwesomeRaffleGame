@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import androidcourse.awesomerafflegame.R;
+import androidcourse.awesomerafflegame.persistence.SharedPreferencesManager;
 
 /**
  * Created by Jesper on 09/05/16.
@@ -34,6 +35,7 @@ public class FirstTimeUsersFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 getDialog().dismiss();
+                SharedPreferencesManager.get().setFirstTimeUser(false);
             }
         });
     }
