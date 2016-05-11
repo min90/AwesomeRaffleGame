@@ -132,7 +132,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
         TextView tvPlayerName = (TextView) view.findViewById(R.id.tv_player_name);
         tvPlayerName.setText(playerName);
 
-        String opponentName = vsPlayer ? "Player 2" : "Computer";
+        opponentName = vsPlayer ? "Player 2" : "Computer";
         tvOpponentName = (TextView) view.findViewById(R.id.tv_opponent_name);
         tvOpponentName.setText(opponentName);
 
@@ -236,7 +236,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
                 bluetoothHandler.sendMessage(TAG_SWAP + "," + LOST_ALL_POINTS);
             }
 
-            currentPlayerName = opponentName;
+            if (vsPlayer) {
+                currentPlayerName = opponentName;
+            }
             handOverDice(LOST_ALL_POINTS);
         } else if (faceOne == 1 ^ faceTwo == 1) {
             if (!(roundScore < 0)) {
@@ -249,7 +251,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
                 bluetoothHandler.sendMessage(TAG_SWAP + "," + LOST_POINTS_FOR_ROUND + "," + roundScore);
             }
 
-            currentPlayerName = opponentName;
+            if (vsPlayer) {
+                currentPlayerName = opponentName;
+            }
             handOverDice(LOST_POINTS_FOR_ROUND);
         } else {
             roundScore += (faceOne + faceTwo);
@@ -275,14 +279,18 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
         if (faceOne == 1 && faceTwo == 1) {
             opponentTotalScore = 0;
 
-            currentPlayerName = playerName;
+            if (vsPlayer) {
+                currentPlayerName = playerName;
+            }
             handOverDice(LOST_ALL_POINTS);
         } else if (faceOne == 1 ^ faceTwo == 1) {
             if (!(roundScore < 0)) {
                 opponentTotalScore -= roundScore;
             }
 
-            currentPlayerName = playerName;
+            if (vsPlayer) {
+                currentPlayerName = playerName;
+            }
             handOverDice(LOST_POINTS_FOR_ROUND);
         } else {
             roundScore += (faceOne + faceTwo);
@@ -361,8 +369,6 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
             @Override
             public void run() {
                 if (roundScore > 20) {
-
-                    currentPlayerName = playerName;
                     handOverDice(SWAP_TURNS);
                 } else {
                     shakeSensor.doShake();
@@ -448,11 +454,11 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
     public void onClick(View v) {
         if (v.getId() == bHandOverDice.getId()) {
             toggleControls(false);
-            currentPlayerName = opponentName;
-            handOverDice(SWAP_TURNS);
             if (vsPlayer) {
+                currentPlayerName = opponentName;
                 bluetoothHandler.sendMessage(TAG_SWAP + "," + "HAND_OVER");
             }
+            handOverDice(SWAP_TURNS);
         }
     }
 
