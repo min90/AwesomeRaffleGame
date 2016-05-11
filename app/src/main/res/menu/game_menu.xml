@@ -6,6 +6,6 @@
         android:id="@+id/rules_menu"
         android:orderInCategory="100"
         android:icon="@drawable/ic_action_name"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:title="rules"
+        app:showAsAction="always" />
 </menu>

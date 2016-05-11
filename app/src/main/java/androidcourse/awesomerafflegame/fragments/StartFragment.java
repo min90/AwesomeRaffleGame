@@ -2,12 +2,14 @@ package androidcourse.awesomerafflegame.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidcourse.awesomerafflegame.R;
@@ -22,10 +24,14 @@ public class StartFragment extends Fragment implements View.OnClickListener {
 
     private Button btnStartGame;
     private Button btnResults;
-    private Button btnAbout;
+    private Button btnSettings;
+    private Button btnNoFacebook;
+    private Button btnSavePlayerName;
+    private LinearLayout playerNameLayout;
+    private LinearLayout loggedInLayout;
+    private EditText edtPlayerName;
 
     private String name;
-    private boolean nameChanged = false;
 
     private TextView txtWelcomeMessage, versionTxt;
 
@@ -40,33 +46,42 @@ public class StartFragment extends Fragment implements View.OnClickListener {
         btnStartGame.setOnClickListener(this);
         btnResults = (Button) view.findViewById(R.id.btn_results);
         btnResults.setOnClickListener(this);
-        btnAbout = (Button) view.findViewById(R.id.btn_about);
-        btnAbout.setOnClickListener(this);
+        btnSettings = (Button) view.findViewById(R.id.btn_settings);
+        btnSettings.setOnClickListener(this);
         versionTxt = (TextView) view.findViewById(R.id.tv_version);
         txtWelcomeMessage = (TextView) view.findViewById(R.id.tv_playername);
+        loggedInLayout = (LinearLayout) view.findViewById(R.id.logged_in_layout);
+        btnNoFacebook = (Button) view.findViewById(R.id.btn_without_facebook);
+        btnNoFacebook.setOnClickListener(this);
+        btnSavePlayerName = (Button) view.findViewById(R.id.btn_save_player_name);
+        btnSavePlayerName.setOnClickListener(this);
+        playerNameLayout = (LinearLayout) view.findViewById(R.id.player_name_layout);
+        edtPlayerName = (EditText) view.findViewById(R.id.edt_player_name);
 
-        showInfoDialog();
+
+        firstTimeUser();
 
         return view;
     }
+
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         versionTxt.setText(SharedPreferencesManager.get().getVersionName());
-        if (nameChanged) {
-            txtWelcomeMessage.setText("Player: " + name);
-        } else {
-            txtWelcomeMessage.setText("Welcome");
-        }
+        txtWelcomeMessage.setText("Player: " + SharedPreferencesManager.get().getPlayerName());
+
 
     }
 
-    private void showInfoDialog() {
+    private void firstTimeUser() {
         if (SharedPreferencesManager.get().getFirstTimeUser()) {
-            FragmentController.get().transactDialogFragment(getActivity(), FirstTimeUsersFragment.newInstance(name), "info_fragment");
+            DialogFragment fragment = new FirstTimeUsersFragment();
+            FragmentController.get().transactDialogFragment(getActivity(), fragment, "info_fragment");
             SharedPreferencesManager.get().setFirstTimeUser(false);
-            nameChanged = true;
+        } else {
+            btnNoFacebook.setVisibility(View.GONE);
+            loggedInLayout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -86,7 +101,7 @@ public class StartFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == btnAbout.getId()) {
+        if (v.getId() == btnSettings.getId()) {
             settings();
         }
 
@@ -96,6 +111,23 @@ public class StartFragment extends Fragment implements View.OnClickListener {
 
         if (v.getId() == btnResults.getId()) {
             results();
+        }
+        if (v.getId() == btnNoFacebook.getId()) {
+            if (btnNoFacebook.getVisibility() == View.VISIBLE) {
+                btnNoFacebook.setVisibility(View.GONE);
+                loggedInLayout.setVisibility(View.VISIBLE);
+                playerNameLayout.setVisibility(View.VISIBLE);
+                txtWelcomeMessage.setVisibility(View.GONE);
+            }
+        }
+
+        if (v.getId() == btnSavePlayerName.getId()) {
+            if (!edtPlayerName.getText().toString().equalsIgnoreCase("")) {
+                SharedPreferencesManager.get().setPlayerName(edtPlayerName.getText().toString());
+                playerNameLayout.setVisibility(View.GONE);
+                txtWelcomeMessage.setText("Player: " + SharedPreferencesManager.get().getPlayerName());
+                txtWelcomeMessage.setVisibility(View.VISIBLE);
+            }
         }
     }
 }

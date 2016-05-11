@@ -32,7 +32,7 @@ public class SharedPreferencesManager {
     }
 
     public void setVersionName(String version){
-        editor.putString(VERSION_TAG, version).commit();
+        editor.putString(VERSION_TAG, "Version: " + version).commit();
     }
 
     public String getVersionName(){

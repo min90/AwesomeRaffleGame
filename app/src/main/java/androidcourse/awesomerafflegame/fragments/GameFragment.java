@@ -497,7 +497,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.game_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
+        //super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -520,5 +520,6 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
                 dialog.dismiss();
             }
         });
+        builder.show();
     }
 }

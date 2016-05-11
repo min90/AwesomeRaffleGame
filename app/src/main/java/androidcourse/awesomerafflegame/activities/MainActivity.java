@@ -30,6 +30,7 @@ import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
 import androidcourse.awesomerafflegame.controllers.SharedPreferencesManager;
 import androidcourse.awesomerafflegame.bluetooth.BluetoothHandler;
+import androidcourse.awesomerafflegame.fragments.SettingsFragment;
 import androidcourse.awesomerafflegame.fragments.StartFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -124,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken == null || accessToken.isExpired()) {
             createLogin();
+            SharedPreferencesManager.get().setFirstTimeUser(true);
             Log.d(DEBUG_TAG, "Logged in not");
         } else {
             createStartView(Profile.getCurrentProfile());
@@ -166,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            FragmentController.get().transactFragments(this, new SettingsFragment(), "settings_fragment");
             return true;
         }
 

@@ -21,16 +21,6 @@ import androidcourse.awesomerafflegame.controllers.SharedPreferencesManager;
  */
 public class FirstTimeUsersFragment extends DialogFragment {
     private static final String DEBUG_TAG = FirstTimeUsersFragment.class.getSimpleName();
-    private static final String NAME_TAG = "name";
-
-    public static FirstTimeUsersFragment newInstance(String name) {
-        FirstTimeUsersFragment fragment = new FirstTimeUsersFragment();
-        Bundle args = new Bundle();
-        args.putString(NAME_TAG, name);
-
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Nullable
     @Override
@@ -42,25 +32,15 @@ public class FirstTimeUsersFragment extends DialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final EditText edtName = (EditText) view.findViewById(R.id.edt_player_name);
         Button btnOkName = (Button) view.findViewById(R.id.btn_ok_dialog);
 
-        String title = getArguments().getString(NAME_TAG);
-        getDialog().setTitle("Welcome: " + title);
+        getDialog().setTitle("Welcome");
 
         btnOkName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!edtName.getText().toString().equalsIgnoreCase("")){
-                    SharedPreferencesManager.get().setPlayerName(edtName.getText().toString());
-                }
                 getDialog().dismiss();
             }
         });
-    }
-
-    @Override
-    public void onDismiss(DialogInterface dialog) {
-        super.onDismiss(dialog);
     }
 }
