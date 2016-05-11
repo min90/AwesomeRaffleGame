@@ -8,6 +8,17 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/games_rcv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:visibility="visible" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/txt_no_previous"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/previous_games_first_time"
+        android:visibility="gone" />
 
 </LinearLayout>

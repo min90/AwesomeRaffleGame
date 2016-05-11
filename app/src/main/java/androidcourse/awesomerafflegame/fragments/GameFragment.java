@@ -9,6 +9,9 @@ import android.os.Vibrator;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -112,6 +115,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
 
         initDiceIcons(view);
 
+        setHasOptionsMenu(true);
         if (vsPlayer) {
             chooseWhoStarts();
         }
@@ -488,5 +492,33 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
     public void onPause() {
         shakeSensor.unregister();
         super.onPause();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.game_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.rules_menu){
+            showRulesDialog();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showRulesDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Rules");
+        builder.setMessage(R.string.rules);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
     }
 }
