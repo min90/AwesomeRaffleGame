@@ -17,7 +17,7 @@ public class ShakeSensor implements SensorEventListener {
 
     private SensorManager sensorManager;
 
-    private OnShakeListener mListener;
+    private OnShakeListener onShakeListener;
     private long mShakeTimestamp;
     private int mShakeCount;
 
@@ -37,7 +37,7 @@ public class ShakeSensor implements SensorEventListener {
     }
 
     public void doShake() {
-        mListener.onShake(1);
+        onShakeListener.onShake(1);
     }
 
     public void disable() {
@@ -52,12 +52,8 @@ public class ShakeSensor implements SensorEventListener {
         return isEnabled;
     }
 
-    public interface OnShakeListener {
-        void onShake(int count);
-    }
-
     public void setOnShakeListener(OnShakeListener listener) {
-        this.mListener = listener;
+        this.onShakeListener = listener;
     }
 
     @Override
@@ -88,7 +84,7 @@ public class ShakeSensor implements SensorEventListener {
             mShakeTimestamp = now;
             mShakeCount++;
 
-            mListener.onShake(mShakeCount);
+            onShakeListener.onShake(mShakeCount);
         }
     }
 

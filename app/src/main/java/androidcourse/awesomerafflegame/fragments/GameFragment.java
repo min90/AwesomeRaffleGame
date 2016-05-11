@@ -21,14 +21,16 @@ import java.util.Random;
 import androidcourse.awesomerafflegame.bluetooth.BluetoothHandler;
 import androidcourse.awesomerafflegame.bluetooth.listeners.OnBluetoothMessageReceivedListener;
 import androidcourse.awesomerafflegame.R;
+import androidcourse.awesomerafflegame.controllers.FragmentController;
 import androidcourse.awesomerafflegame.domain.Game;
 import androidcourse.awesomerafflegame.persistence.DatabaseHandler;
+import androidcourse.awesomerafflegame.sensors.OnShakeListener;
 import androidcourse.awesomerafflegame.sensors.ShakeSensor;
 
 /**
  * Created by Mads on 01/05/16.
  */
-public class GameFragment extends Fragment implements View.OnClickListener, ShakeSensor.OnShakeListener, OnBluetoothMessageReceivedListener {
+public class GameFragment extends Fragment implements View.OnClickListener, OnShakeListener, OnBluetoothMessageReceivedListener {
 
     private final int PLAYER_ONE = 1;
     private final int PLAYER_TWO = 2;
@@ -391,6 +393,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 resetGame();
+                if (vsPlayer) {
+                    bluetoothHandler.sendMessage(TAG_RESET);
+                }
                 dialog.dismiss();
             }
         });
@@ -398,7 +403,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+                FragmentController.get().returnToHome(getActivity());
             }
         });
 
@@ -416,8 +421,6 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
 
         if (currentPlayer == COMPUTER) {
             handOverDice(SWAP_TURNS, "You");
-        } else if (vsPlayer) {
-            bluetoothHandler.sendMessage(TAG_RESET);
         }
     }
 
@@ -426,7 +429,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         if (v.getId() == bHandOverDice.getId()) {
             toggleControls(false);
             handOverDice(SWAP_TURNS, "They");
-            bluetoothHandler.sendMessage(TAG_SWAP + "," + "HAND_OVER");
+            if (vsPlayer) {
+                bluetoothHandler.sendMessage(TAG_SWAP + "," + "HAND_OVER");
+            }
         }
     }
 
