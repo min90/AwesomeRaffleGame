@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Random;
 
@@ -59,6 +60,8 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     private TextView tvAnnouncement;
 
     private Button bHandOverDice;
+
+    private AlertDialog endOfGameDialog;
 
     private int currentPlayer;
     private String currentPlayerName;
@@ -388,17 +391,18 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 resetGame();
+                dialog.dismiss();
             }
         });
 
         dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //return to home
+                dialog.dismiss();
             }
         });
 
-        dialog.create();
+        endOfGameDialog = dialog.create();
         dialog.show();
     }
 
@@ -406,8 +410,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
         playerOneTotalScore = 0;
         opponentTotalScore = 0;
         roundScore = 0;
-        tvPlayerOneScore.setText("0");
-        tvOpponentScore.setText("0");
+        tvPlayerOneScore.setText(playerOneTotalScore);
+        tvOpponentScore.setText(opponentTotalScore);
+        tvRoundScore.setText(roundScore);
 
         if (currentPlayer == COMPUTER) {
             handOverDice(SWAP_TURNS, "You");
@@ -435,21 +440,23 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
     @Override
     public void onMessageReceived(String message) {
         if (message.split(",")[0].equals(TAG_WHO_STARTS)) {
-            if(Integer.parseInt(message.split(",")[1]) > initialRoll) {
-                /**
-                 * Their initial roll were bigger, hand over the dice to them
-                 */
+            if (Integer.parseInt(message.split(",")[1]) > initialRoll) {
+
+                //Their initial roll was bigger, hand over the dice to them
+                Toast.makeText(getActivity(), "They start!", Toast.LENGTH_SHORT).show();
                 bHandOverDice.performClick();
+            } else {
+
+                // Your initial roll was bigger, keep the dice
+                Toast.makeText(getActivity(), "You start!", Toast.LENGTH_SHORT).show();
             }
         } else if (message.split(",")[0].equals(TAG_SCORE) && message.split(",").length > 1) {
-            /**
-             * Message contains a SCORE - update opponents score
-             */
+
+            //Message contains a SCORE - update opponents score
             updateOpponentScore(Integer.parseInt(message.split(",")[1]), Integer.parseInt(message.split(",")[2]));
         } else if (message.split(",")[0].equals(TAG_SWAP)) {
-            /**
-             * Message contains a SWAP request, and additional information - update accordingly
-             */
+
+            //Message contains a SWAP request, and additional information - update accordingly
             if (message.split(",")[1].equals(String.valueOf(LOST_ALL_POINTS))) {
                 opponentTotalScore = 0;
             } else if (message.split(",")[1].equals(String.valueOf(LOST_POINTS_FOR_ROUND))) {
@@ -460,6 +467,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, Shak
             handOverDice(SWAP_TURNS, "You");
         } else if (message.equals(TAG_RESET)) {
             resetGame();
+            chooseWhoStarts();
+
+            endOfGameDialog.dismiss();
         }
     }
 

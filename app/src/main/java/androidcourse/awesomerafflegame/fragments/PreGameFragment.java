@@ -38,6 +38,8 @@ public class PreGameFragment extends Fragment implements View.OnClickListener, O
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        BluetoothHandler.get().setOnBluetoothConnectionListener(this);
+
         btnVsComputer = (Button) view.findViewById(R.id.btn_vs_computer);
         btnVsComputer.setOnClickListener(this);
 
@@ -65,8 +67,6 @@ public class PreGameFragment extends Fragment implements View.OnClickListener, O
             FragmentController.get().transactFragments(getActivity(), GameFragment.newInstance(GameFragment.VS_COMPUTER), "game_fragment");
         }
         if (v.getId() == btnVsPlayer.getId()) {
-            BluetoothHandler.get().setOnBluetoothConnectionListener(this);
-
             btnVsComputer.setEnabled(false);
             blueLayout.setVisibility(View.VISIBLE);
         }
