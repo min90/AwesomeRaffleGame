@@ -485,7 +485,9 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
             if (Integer.parseInt(message.split(",")[2]) > initialRoll) {
 
                 //Their initial roll was bigger, hand over the dice to them
-                bHandOverDice.performClick();
+                toggleControls(false);
+                togglePlayerNames();
+                handOverDice(SWAP_TURNS);
             }
         } else if (message.split(",")[0].equals(TAG_SCORE) && message.split(",").length > 1) {
 
