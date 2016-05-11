@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -233,6 +234,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
             if (vsPlayer) {
                 // Playing via Bluetooth - send result to opponent
                 toggleControls(false);
+                currentPlayerName = playerName;
                 bluetoothHandler.sendMessage(TAG_SWAP + "," + LOST_ALL_POINTS);
             }
 
@@ -245,6 +247,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
             if (vsPlayer) {
                 // Playing via Bluetooth - send result to opponent
                 toggleControls(false);
+                currentPlayerName = playerName;
                 bluetoothHandler.sendMessage(TAG_SWAP + "," + LOST_POINTS_FOR_ROUND + "," + roundScore);
             }
 
@@ -273,12 +276,14 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
         if (faceOne == 1 && faceTwo == 1) {
             opponentTotalScore = 0;
 
+            if (vsPlayer) currentPlayerName = opponentName;
             handOverDice(LOST_ALL_POINTS);
         } else if (faceOne == 1 ^ faceTwo == 1) {
             if (!(roundScore < 0)) {
                 opponentTotalScore -= roundScore;
             }
 
+            if (vsPlayer) currentPlayerName = opponentName;
             handOverDice(LOST_POINTS_FOR_ROUND);
         } else {
             roundScore += (faceOne + faceTwo);
@@ -312,8 +317,10 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
             tvAnnouncement.setText("Handing over dice");
         } else if (announcement == LOST_POINTS_FOR_ROUND) {
             tvAnnouncement.setText(String.format("%s lost points for this round. Handing over dice", currentPlayerName));
+            togglePlayerNames();
         } else if (announcement == LOST_ALL_POINTS) {
             tvAnnouncement.setText(String.format("%s lost all points. Handing over dice", currentPlayerName));
+            togglePlayerNames();
         }
 
         if (getArguments().getInt(TAG_VERSUS) == VS_COMPUTER) {
@@ -326,12 +333,6 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
                 // Release sensor and buttons to user after computer turn ends
                 toggleControls(true);
             }
-        } else {
-            if (currentPlayerName.equals(playerName)) {
-                currentPlayerName = opponentName;
-            } else if (currentPlayerName.equals(opponentName)) {
-                currentPlayerName = playerName;
-            }
         }
 
         tvCurrentPlayer.setText(String.format("%s has the dice", currentPlayerName));
@@ -341,6 +342,17 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
         }
 
     }
+
+    private void togglePlayerNames() {
+        if (vsPlayer) {
+            if (currentPlayerName.equals(opponentName)) {
+                currentPlayerName = playerName;
+            } else {
+                currentPlayerName = opponentName;
+            }
+        }
+    }
+
 
     private void toggleControls(boolean enable) {
         if (enable) {
@@ -448,6 +460,7 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
         if (v.getId() == bHandOverDice.getId()) {
             toggleControls(false);
             if (vsPlayer) {
+                togglePlayerNames();
                 bluetoothHandler.sendMessage(TAG_SWAP + "," + "HAND_OVER");
             }
             handOverDice(SWAP_TURNS);
@@ -464,19 +477,16 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
     @Override
     public void onMessageReceived(String message) {
         if (message.split(",")[0].equals(TAG_WHO_STARTS)) {
+            Log.d("MESSAGE", message);
             opponentName = message.split(",")[1];
+
             // Update opponent TextView while we have the name
             tvOpponentName.setText(opponentName);
 
             if (Integer.parseInt(message.split(",")[2]) > initialRoll) {
 
                 //Their initial roll was bigger, hand over the dice to them
-                Toast.makeText(getActivity(), opponentName + " starts!", Toast.LENGTH_SHORT).show();
                 bHandOverDice.performClick();
-            } else {
-
-                // Your initial roll was bigger, keep the dice
-                Toast.makeText(getActivity(), playerName + " starts!", Toast.LENGTH_SHORT).show();
             }
         } else if (message.split(",")[0].equals(TAG_SCORE) && message.split(",").length > 1) {
 
@@ -487,11 +497,14 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
             //Message contains a SWAP request, and additional information - update accordingly
             if (message.split(",")[1].equals(String.valueOf(LOST_ALL_POINTS))) {
                 opponentTotalScore = 0;
+                currentPlayerName = opponentName;
                 handOverDice(LOST_ALL_POINTS);
             } else if (message.split(",")[1].equals(String.valueOf(LOST_POINTS_FOR_ROUND))) {
                 opponentTotalScore -= Integer.parseInt(message.split(",")[2]);
+                currentPlayerName = opponentName;
                 handOverDice(LOST_POINTS_FOR_ROUND);
             } else {
+                currentPlayerName = playerName;
                 handOverDice(SWAP_TURNS);
             }
             tvOpponentScore.setText(String.valueOf(opponentTotalScore));
