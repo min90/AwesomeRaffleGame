@@ -12,7 +12,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidcourse.awesomerafflegame.listeners.OnMessageReceivedListener;
-import androidcourse.awesomerafflegame.listeners.ConnectionListener;
+import androidcourse.awesomerafflegame.listeners.OnBluetoothConnectionListener;
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.activities.DeviceListActivity;
 import androidcourse.awesomerafflegame.adapters.Constants;
@@ -30,8 +30,8 @@ public class BluetoothHandler {
     private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
     private static final int REQUEST_ENABLE_BT = 3;
 
-    private OnMessageReceivedListener msgReceivedListener;
-    private ConnectionListener connectionListener;
+    private OnMessageReceivedListener onMessageReceivedListener;
+    private OnBluetoothConnectionListener onBluetoothConnectionListener;
 
     private Context context;
 
@@ -107,11 +107,11 @@ public class BluetoothHandler {
     }
 
     public void setOnMessageReceivedListener(OnMessageReceivedListener listener) {
-        this.msgReceivedListener = listener;
+        this.onMessageReceivedListener = listener;
     }
 
-    public void setConnectionListener(ConnectionListener listener){
-        this.connectionListener = listener;
+    public void setOnBluetoothConnectionListener(OnBluetoothConnectionListener listener){
+        this.onBluetoothConnectionListener = listener;
     }
 
     /**
@@ -165,13 +165,13 @@ public class BluetoothHandler {
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    msgReceivedListener.onMessageReceived(readMessage);
+                    onMessageReceivedListener.onMessageReceived(readMessage);
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name
                     mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
                     if (null != activity) {
-                        connectionListener.setUpPlayerVsPlayer();
+                        onBluetoothConnectionListener.onBluetoothConnection();
                         Toast.makeText(activity, "Connected to " + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
                     }
                     break;
