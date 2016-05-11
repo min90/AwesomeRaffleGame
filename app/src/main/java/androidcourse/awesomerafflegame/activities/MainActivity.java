@@ -28,7 +28,7 @@ import java.util.Arrays;
 
 import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
-import androidcourse.awesomerafflegame.controllers.SharedPreferencesManager;
+import androidcourse.awesomerafflegame.persistence.SharedPreferencesManager;
 import androidcourse.awesomerafflegame.bluetooth.BluetoothHandler;
 import androidcourse.awesomerafflegame.fragments.SettingsFragment;
 import androidcourse.awesomerafflegame.fragments.StartFragment;

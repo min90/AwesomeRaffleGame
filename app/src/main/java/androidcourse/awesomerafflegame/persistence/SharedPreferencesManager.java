@@ -1,4 +1,4 @@
-package androidcourse.awesomerafflegame.controllers;
+package androidcourse.awesomerafflegame.persistence;
 
 import android.content.Context;
 import android.content.SharedPreferences;

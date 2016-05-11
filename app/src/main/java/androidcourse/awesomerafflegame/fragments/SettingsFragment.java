@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import androidcourse.awesomerafflegame.R;
-import androidcourse.awesomerafflegame.controllers.SharedPreferencesManager;
+import androidcourse.awesomerafflegame.persistence.SharedPreferencesManager;
 
 /**
  * Created by Jesper on 11/05/16.

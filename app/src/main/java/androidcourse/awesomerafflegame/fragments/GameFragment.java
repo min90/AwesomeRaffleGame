@@ -25,7 +25,7 @@ import androidcourse.awesomerafflegame.R;
 import androidcourse.awesomerafflegame.bluetooth.BluetoothHandler;
 import androidcourse.awesomerafflegame.bluetooth.listeners.OnBluetoothMessageReceivedListener;
 import androidcourse.awesomerafflegame.controllers.FragmentController;
-import androidcourse.awesomerafflegame.controllers.SharedPreferencesManager;
+import androidcourse.awesomerafflegame.persistence.SharedPreferencesManager;
 import androidcourse.awesomerafflegame.domain.Game;
 import androidcourse.awesomerafflegame.persistence.DatabaseHandler;
 import androidcourse.awesomerafflegame.sensors.OnShakeListener;
@@ -236,9 +236,6 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
                 bluetoothHandler.sendMessage(TAG_SWAP + "," + LOST_ALL_POINTS);
             }
 
-            if (vsPlayer) {
-                currentPlayerName = opponentName;
-            }
             handOverDice(LOST_ALL_POINTS);
         } else if (faceOne == 1 ^ faceTwo == 1) {
             if (!(roundScore < 0)) {
@@ -251,9 +248,6 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
                 bluetoothHandler.sendMessage(TAG_SWAP + "," + LOST_POINTS_FOR_ROUND + "," + roundScore);
             }
 
-            if (vsPlayer) {
-                currentPlayerName = opponentName;
-            }
             handOverDice(LOST_POINTS_FOR_ROUND);
         } else {
             roundScore += (faceOne + faceTwo);
@@ -279,18 +273,12 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
         if (faceOne == 1 && faceTwo == 1) {
             opponentTotalScore = 0;
 
-            if (vsPlayer) {
-                currentPlayerName = playerName;
-            }
             handOverDice(LOST_ALL_POINTS);
         } else if (faceOne == 1 ^ faceTwo == 1) {
             if (!(roundScore < 0)) {
                 opponentTotalScore -= roundScore;
             }
 
-            if (vsPlayer) {
-                currentPlayerName = playerName;
-            }
             handOverDice(LOST_POINTS_FOR_ROUND);
         } else {
             roundScore += (faceOne + faceTwo);
@@ -337,6 +325,12 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
                 currentPlayerName = playerName;
                 // Release sensor and buttons to user after computer turn ends
                 toggleControls(true);
+            }
+        } else {
+            if (currentPlayerName.equals(playerName)) {
+                currentPlayerName = opponentName;
+            } else if (currentPlayerName.equals(opponentName)) {
+                currentPlayerName = playerName;
             }
         }
 
@@ -445,7 +439,6 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
         tvRoundScore.setText(roundScore);
 
         if (currentPlayer == COMPUTER) {
-            currentPlayerName = playerName;
             handOverDice(SWAP_TURNS);
         }
     }
@@ -455,7 +448,6 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
         if (v.getId() == bHandOverDice.getId()) {
             toggleControls(false);
             if (vsPlayer) {
-                currentPlayerName = opponentName;
                 bluetoothHandler.sendMessage(TAG_SWAP + "," + "HAND_OVER");
             }
             handOverDice(SWAP_TURNS);
@@ -495,13 +487,15 @@ public class GameFragment extends Fragment implements View.OnClickListener, OnSh
             //Message contains a SWAP request, and additional information - update accordingly
             if (message.split(",")[1].equals(String.valueOf(LOST_ALL_POINTS))) {
                 opponentTotalScore = 0;
+                handOverDice(LOST_ALL_POINTS);
             } else if (message.split(",")[1].equals(String.valueOf(LOST_POINTS_FOR_ROUND))) {
                 opponentTotalScore -= Integer.parseInt(message.split(",")[2]);
+                handOverDice(LOST_POINTS_FOR_ROUND);
+            } else {
+                handOverDice(SWAP_TURNS);
             }
             tvOpponentScore.setText(String.valueOf(opponentTotalScore));
             toggleControls(true);
-            currentPlayerName = playerName;
-            handOverDice(SWAP_TURNS);
         } else if (message.equals(TAG_RESET)) {
             resetGame();
             chooseWhoStarts();
